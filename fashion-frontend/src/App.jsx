@@ -95,7 +95,120 @@ export default function App() {
   });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
+ // Dynamic Catalog Generator for Online Showcase
+  const generateFallbackCatalog = () => {
+    const menImages = [
+      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1488161628813-04466f872be2?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80'
+    ];
+
+    const womenImages = [
+      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'
+    ];
+
+    const kidsImages = [
+      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=800&q=80',
+      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=800&q=80'
+    ];
+
+    const items = [];
+    const titles = {
+      Men: ['Tailored Wool Blazer', 'Heavyweight Oversized Tee', 'Pleated Straight Trouser', 'Cashmere Knit Crewneck', 'Structured Minimal Trench', 'French Terry Hoodie', 'Linen Relaxed Shirt', 'Japanese Selvedge Denim'],
+      Women: ['Sculpted Hourglass Blazer', 'Silk Drape Slip Dress', 'Merino Ribbed Knit Sweater', 'High-Rise Tailored Pant', 'Belted Cashmere Overcoat', 'Structured Poplin Blouse', 'Pleated Midi Skirt', 'Brushed Wool Cardigan'],
+      Kids: ['Organic Cotton Hoodie', 'Everyday Minimal Jogger', 'Relaxed French Terry Sweatshirt', 'Structured Mini Bomber Jacket', 'Soft Knit Ribbed Beanie', 'Organic Fleece Crewneck', 'Chino Utility Pants', 'Warm Puffer Vest']
+    };
+
+    const categories = ['Women', 'Men', 'Kids'];
+
+    for (let i = 1; i <= 200; i++) {
+      const cat = categories[i % 3];
+      const titleList = titles[cat];
+      const titleName = `${titleList[i % titleList.length]} Edition ${Math.floor(i / 3) + 1}`;
+      const imgPool = cat === 'Men' ? menImages : cat === 'Women' ? womenImages : kidsImages;
+      const thumbnail = imgPool[i % imgPool.length];
+      const price = (45 + (i * 7) % 180).toFixed(2);
+
+      items.push({
+        id: i,
+        title: titleName,
+        slug: `product-${i}-${cat.toLowerCase()}`,
+        category_name: cat,
+        base_price: price,
+        description: `Precision-crafted ${cat.toLowerCase()}'s luxury garment. Structured from organic long-staple fibers, featuring tailored finishes and natural drape.`,
+        thumbnail_url: thumbnail,
+        images: [
+          { id: 1, image_url: thumbnail, color_id: 1 },
+          { id: 2, image_url: imgPool[(i + 1) % imgPool.length], color_id: 2 }
+        ],
+        variants: [
+          { id: i * 10 + 1, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'S', stock_quantity: 12, sku: `SKU-${i}-S` },
+          { id: i * 10 + 2, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 2, size_name: 'M', stock_quantity: 18, sku: `SKU-${i}-M` },
+          { id: i * 10 + 3, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 3, size_name: 'L', stock_quantity: 8, sku: `SKU-${i}-L` },
+          { id: i * 10 + 4, color_id: 2, color_name: 'Raw Ecru', hex_code: '#FAF9F6', size_id: 1, size_name: 'S', stock_quantity: 10, sku: `SKU-${i}-W-S` },
+          { id: i * 10 + 5, color_id: 2, color_name: 'Raw Ecru', hex_code: '#FAF9F6', size_id: 2, size_name: 'M', stock_quantity: 15, sku: `SKU-${i}-W-M` }
+        ]
+      });
+    }
+    return items;
+  };
+
   const fetchProductsList = () => {
+    axios.get('http://localhost:5000/api/products', { timeout: 1500 })
+      .then(res => {
+        const list = res.data.data || [];
+        if (list.length > 0) {
+          setProductsList(list);
+          if (!selectedSlug) {
+            setSelectedSlug(list[0].slug);
+            fetchProductDetail(list[0].slug);
+          }
+        } else {
+          loadFallback();
+        }
+      })
+      .catch(() => {
+        loadFallback();
+      });
+  };
+
+  const loadFallback = () => {
+    const list = generateFallbackCatalog();
+    setProductsList(list);
+    if (list.length > 0 && !selectedSlug) {
+      setSelectedSlug(list[0].slug);
+      setProduct(list[0]);
+      setSelectedColor(1);
+      setActiveImage(list[0].thumbnail_url);
+      setReviews([
+        { id: 1, reviewer_name: 'Sophia L.', rating: 5, fit_feedback: 'True to Size', review_text: 'The drape and tailoring on this piece is unmatched. Feels like a $400 boutique coat.', created_at: new Date().toISOString() },
+        { id: 2, reviewer_name: 'Marcus K.', rating: 5, fit_feedback: 'True to Size', review_text: 'Heavyweight organic fabric with premium stitching. 10/10 recommendation.', created_at: new Date().toISOString() }
+      ]);
+      setLoading(false);
+    }
+  };
     axios.get('http://localhost:5000/api/products')
       .then(res => {
         const list = res.data.data || [];
