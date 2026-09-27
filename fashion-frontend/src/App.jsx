@@ -7,6 +7,81 @@ import {
   MessageSquare, Tag, Sparkles, PackageSearch, Truck, CreditCard, Banknote
 } from 'lucide-react';
 
+// Pre-generated 200 Products Dataset for Instant Showcase
+const initialCatalog = (() => {
+  const menImages = [
+    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1488161628813-04466f872be2?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80'
+  ];
+
+  const womenImages = [
+    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'
+  ];
+
+  const kidsImages = [
+    'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=800&q=80',
+    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=800&q=80'
+  ];
+
+  const titles = {
+    Men: ['Tailored Wool Blazer', 'Heavyweight Oversized Tee', 'Pleated Straight Trouser', 'Cashmere Knit Crewneck', 'Structured Minimal Trench', 'French Terry Hoodie', 'Linen Relaxed Shirt', 'Japanese Selvedge Denim'],
+    Women: ['Sculpted Hourglass Blazer', 'Silk Drape Slip Dress', 'Merino Ribbed Knit Sweater', 'High-Rise Tailored Pant', 'Belted Cashmere Overcoat', 'Structured Poplin Blouse', 'Pleated Midi Skirt', 'Brushed Wool Cardigan'],
+    Kids: ['Organic Cotton Hoodie', 'Everyday Minimal Jogger', 'Relaxed French Terry Sweatshirt', 'Structured Mini Bomber Jacket', 'Soft Knit Ribbed Beanie', 'Organic Fleece Crewneck', 'Chino Utility Pants', 'Warm Puffer Vest']
+  };
+
+  const cats = ['Women', 'Men', 'Kids'];
+  const res = [];
+  for (let i = 1; i <= 200; i++) {
+    const cat = cats[i % 3];
+    const pool = cat === 'Men' ? menImages : cat === 'Women' ? womenImages : kidsImages;
+    const thumb = pool[i % pool.length];
+    res.push({
+      id: i,
+      title: `${titles[cat][i % titles[cat].length]} Ed. ${Math.floor(i / 3) + 1}`,
+      slug: `product-${i}-${cat.toLowerCase()}`,
+      category_name: cat,
+      base_price: (45 + (i * 7) % 180).toFixed(2),
+      description: `Precision-crafted ${cat.toLowerCase()}'s luxury garment. Structured from organic long-staple fibers, featuring tailored finishes and natural drape.`,
+      thumbnail_url: thumb,
+      images: [
+        { id: 1, image_url: thumb, color_id: 1 },
+        { id: 2, image_url: pool[(i + 1) % pool.length], color_id: 2 }
+      ],
+      variants: [
+        { id: i * 10 + 1, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'S', stock_quantity: 12, sku: `SKU-${i}-S` },
+        { id: i * 10 + 2, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 2, size_name: 'M', stock_quantity: 18, sku: `SKU-${i}-M` },
+        { id: i * 10 + 3, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 3, size_name: 'L', stock_quantity: 8, sku: `SKU-${i}-L` },
+        { id: i * 10 + 4, color_id: 2, color_name: 'Raw Ecru', hex_code: '#FAF9F6', size_id: 1, size_name: 'S', stock_quantity: 10, sku: `SKU-${i}-W-S` },
+        { id: i * 10 + 5, color_id: 2, color_name: 'Raw Ecru', hex_code: '#FAF9F6', size_id: 2, size_name: 'M', stock_quantity: 15, sku: `SKU-${i}-W-M` }
+      ]
+    });
+  }
+  return res;
+})();
+
 export default function App() {
   const [view, setView] = useState('store'); 
   const [storeMode, setStoreMode] = useState('catalog'); 
@@ -16,14 +91,17 @@ export default function App() {
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('default');
 
-  // Catalog & Product states
-  const [productsList, setProductsList] = useState([]);
-  const [selectedSlug, setSelectedSlug] = useState('');
-  const [product, setProduct] = useState(null);
-  const [loading, setLoading] = useState(true);
+  // Catalog & Product states (Instant 200 items loaded!)
+  const [productsList, setProductsList] = useState(initialCatalog);
+  const [selectedSlug, setSelectedSlug] = useState(initialCatalog[0].slug);
+  const [product, setProduct] = useState(initialCatalog[0]);
+  const [loading, setLoading] = useState(false);
 
   // Reviews States
-  const [reviews, setReviews] = useState([]);
+  const [reviews, setReviews] = useState([
+    { id: 1, reviewer_name: 'Sophia L.', rating: 5, fit_feedback: 'True to Size', review_text: 'The drape and tailoring on this piece is unmatched. Heavyweight organic fabric with premium stitching.', created_at: new Date().toISOString() },
+    { id: 2, reviewer_name: 'Marcus K.', rating: 5, fit_feedback: 'True to Size', review_text: 'Structured silhouette and exceptional feel. 10/10 recommendation.', created_at: new Date().toISOString() }
+  ]);
   const [newReview, setNewReview] = useState({
     reviewer_name: '',
     rating: 5,
@@ -33,9 +111,9 @@ export default function App() {
   const [submittingReview, setSubmittingReview] = useState(false);
 
   // Variant & Cart states
-  const [selectedColor, setSelectedColor] = useState(null);
+  const [selectedColor, setSelectedColor] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
-  const [activeImage, setActiveImage] = useState('');
+  const [activeImage, setActiveImage] = useState(initialCatalog[0].thumbnail_url);
   const [cart, setCart] = useState([]);
   const [isCartOpen, setIsCartOpen] = useState(false);
   const [isCheckoutOpen, setIsCheckoutOpen] = useState(false);
@@ -43,7 +121,7 @@ export default function App() {
   const [orderSuccessData, setOrderSuccessData] = useState(null);
 
   // Payment Selection States (Stripe / Cash)
-  const [paymentMethod, setPaymentMethod] = useState('card'); // 'card' or 'cod'
+  const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardDetails, setCardDetails] = useState({
     cardNumber: '4242 •••• •••• 4242',
     cardExp: '12/28',
@@ -78,7 +156,10 @@ export default function App() {
   });
 
   // Admin Dashboard States
-  const [orders, setOrders] = useState([]);
+  const [orders, setOrders] = useState([
+    { id: 101, customer_name: 'Alexander Wright', customer_email: 'alex@example.com', shipping_address: '450 Lexington Ave', city: 'New York', postal_code: '10017', total_amount: '185.00', order_status: 'delivered' },
+    { id: 102, customer_name: 'Elena Rostova', customer_email: 'elena@example.com', shipping_address: '12 Queen St', city: 'London', postal_code: 'W1J 5PA', total_amount: '240.00', order_status: 'shipped' }
+  ]);
   const [adminTab, setAdminTab] = useState('orders'); 
 
   // Admin New Product Form State
@@ -95,180 +176,31 @@ export default function App() {
   });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
- // Dynamic Catalog Generator for Online Showcase
-  const generateFallbackCatalog = () => {
-    const menImages = [
-      'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1488161628813-04466f872be2?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&w=800&q=80'
-    ];
-
-    const womenImages = [
-      'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1576566588028-4147f3842f27?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1485230895905-ec40ba36b9bc?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&w=800&q=80'
-    ];
-
-    const kidsImages = [
-      'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=800&q=80',
-      'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=800&q=80'
-    ];
-
-    const items = [];
-    const titles = {
-      Men: ['Tailored Wool Blazer', 'Heavyweight Oversized Tee', 'Pleated Straight Trouser', 'Cashmere Knit Crewneck', 'Structured Minimal Trench', 'French Terry Hoodie', 'Linen Relaxed Shirt', 'Japanese Selvedge Denim'],
-      Women: ['Sculpted Hourglass Blazer', 'Silk Drape Slip Dress', 'Merino Ribbed Knit Sweater', 'High-Rise Tailored Pant', 'Belted Cashmere Overcoat', 'Structured Poplin Blouse', 'Pleated Midi Skirt', 'Brushed Wool Cardigan'],
-      Kids: ['Organic Cotton Hoodie', 'Everyday Minimal Jogger', 'Relaxed French Terry Sweatshirt', 'Structured Mini Bomber Jacket', 'Soft Knit Ribbed Beanie', 'Organic Fleece Crewneck', 'Chino Utility Pants', 'Warm Puffer Vest']
-    };
-
-    const categories = ['Women', 'Men', 'Kids'];
-
-    for (let i = 1; i <= 200; i++) {
-      const cat = categories[i % 3];
-      const titleList = titles[cat];
-      const titleName = `${titleList[i % titleList.length]} Edition ${Math.floor(i / 3) + 1}`;
-      const imgPool = cat === 'Men' ? menImages : cat === 'Women' ? womenImages : kidsImages;
-      const thumbnail = imgPool[i % imgPool.length];
-      const price = (45 + (i * 7) % 180).toFixed(2);
-
-      items.push({
-        id: i,
-        title: titleName,
-        slug: `product-${i}-${cat.toLowerCase()}`,
-        category_name: cat,
-        base_price: price,
-        description: `Precision-crafted ${cat.toLowerCase()}'s luxury garment. Structured from organic long-staple fibers, featuring tailored finishes and natural drape.`,
-        thumbnail_url: thumbnail,
-        images: [
-          { id: 1, image_url: thumbnail, color_id: 1 },
-          { id: 2, image_url: imgPool[(i + 1) % imgPool.length], color_id: 2 }
-        ],
-        variants: [
-          { id: i * 10 + 1, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'S', stock_quantity: 12, sku: `SKU-${i}-S` },
-          { id: i * 10 + 2, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 2, size_name: 'M', stock_quantity: 18, sku: `SKU-${i}-M` },
-          { id: i * 10 + 3, color_id: 1, color_name: 'Charcoal Noir', hex_code: '#1A1A1A', size_id: 3, size_name: 'L', stock_quantity: 8, sku: `SKU-${i}-L` },
-          { id: i * 10 + 4, color_id: 2, color_name: 'Raw Ecru', hex_code: '#FAF9F6', size_id: 1, size_name: 'S', stock_quantity: 10, sku: `SKU-${i}-W-S` },
-          { id: i * 10 + 5, color_id: 2, color_name: 'Raw Ecru', hex_code: '#FAF9F6', size_id: 2, size_name: 'M', stock_quantity: 15, sku: `SKU-${i}-W-M` }
-        ]
-      });
-    }
-    return items;
-  };
-
-  const fetchProductsList = () => {
-    axios.get('http://localhost:5000/api/products', { timeout: 1500 })
+  // Connect to local backend if running, otherwise seamlessly keep instant catalog
+  useEffect(() => {
+    axios.get('http://localhost:5000/api/products', { timeout: 1000 })
       .then(res => {
-        const list = res.data.data || [];
-        if (list.length > 0) {
-          setProductsList(list);
-          if (!selectedSlug) {
-            setSelectedSlug(list[0].slug);
-            fetchProductDetail(list[0].slug);
-          }
-        } else {
-          loadFallback();
+        if (res.data?.data && res.data.data.length > 0) {
+          setProductsList(res.data.data);
+          setSelectedSlug(res.data.data[0].slug);
         }
       })
       .catch(() => {
-        loadFallback();
+        // Fallback already pre-loaded into state
       });
-  };
-
-  const loadFallback = () => {
-    const list = generateFallbackCatalog();
-    setProductsList(list);
-    if (list.length > 0 && !selectedSlug) {
-      setSelectedSlug(list[0].slug);
-      setProduct(list[0]);
-      setSelectedColor(1);
-      setActiveImage(list[0].thumbnail_url);
-      setReviews([
-        { id: 1, reviewer_name: 'Sophia L.', rating: 5, fit_feedback: 'True to Size', review_text: 'The drape and tailoring on this piece is unmatched. Feels like a $400 boutique coat.', created_at: new Date().toISOString() },
-        { id: 2, reviewer_name: 'Marcus K.', rating: 5, fit_feedback: 'True to Size', review_text: 'Heavyweight organic fabric with premium stitching. 10/10 recommendation.', created_at: new Date().toISOString() }
-      ]);
-      setLoading(false);
-    }
-  };
-    axios.get('http://localhost:5000/api/products')
-      .then(res => {
-        const list = res.data.data || [];
-        setProductsList(list);
-        if (list.length > 0 && !selectedSlug) {
-          setSelectedSlug(list[0].slug);
-          fetchProductDetail(list[0].slug);
-        }
-      })
-      .catch(err => console.error('Failed to load products list:', err));
-  };
-
-  const fetchProductReviews = (productId) => {
-    axios.get(`http://localhost:5000/api/products/${productId}/reviews`)
-      .then(res => setReviews(res.data.data || []))
-      .catch(err => console.error('Failed to load reviews:', err));
-  };
-
-  const fetchProductDetail = (slug) => {
-    if (!slug) return;
-    setLoading(true);
-    axios.get(`http://localhost:5000/api/products/${slug}`)
-      .then(res => {
-        const data = res.data.data;
-        setProduct(data);
-        if (data.variants && data.variants.length > 0) {
-          const defaultColorId = data.variants[0].color_id;
-          setSelectedColor(defaultColorId);
-          setSelectedSize(null);
-          const colorImages = data.images.filter(img => img.color_id === defaultColorId);
-          setActiveImage(colorImages[0]?.image_url || data.images[0]?.image_url || '');
-        }
-        fetchProductReviews(data.id);
-        setLoading(false);
-      })
-      .catch(err => {
-        console.error('Failed to load product detail:', err);
-        setLoading(false);
-      });
-  };
-
-  const fetchOrders = () => {
-    axios.get('http://localhost:5000/api/admin/orders')
-      .then(res => setOrders(res.data.data || []))
-      .catch(err => console.error('Failed to load admin orders:', err));
-  };
-
-  useEffect(() => {
-    fetchProductsList();
   }, []);
-
-  useEffect(() => {
-    if (view === 'admin') {
-      fetchOrders();
-    }
-  }, [view]);
 
   const handleSelectProduct = (slug) => {
     setSelectedSlug(slug);
-    fetchProductDetail(slug);
+    const found = productsList.find(p => p.slug === slug);
+    if (found) {
+      setProduct(found);
+      if (found.variants && found.variants.length > 0) {
+        setSelectedColor(found.variants[0].color_id);
+      }
+      setActiveImage(found.thumbnail_url || found.images?.[0]?.image_url);
+      setSelectedSize(null);
+    }
     setStoreMode('product');
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
@@ -294,7 +226,7 @@ export default function App() {
     new Map(product.variants.map(v => [v.size_id, { id: v.size_id, name: v.size_name }])).values()
   ) : [];
 
-  const displayedImages = product ? product.images.filter(img => img.color_id === selectedColor) : [];
+  const displayedImages = product?.images?.filter(img => img.color_id === selectedColor) || [];
 
   const currentVariant = product ? product.variants.find(
     v => v.color_id === selectedColor && v.size_id === selectedSize
@@ -353,24 +285,24 @@ export default function App() {
   const cartFinalTotal = Math.max(0, cartSubtotal - discountAmount);
   const totalItemsCount = cart.reduce((acc, item) => acc + item.quantity, 0);
 
-  const handleApplyCoupon = async (e) => {
+  const handleApplyCoupon = (e) => {
     e.preventDefault();
     if (!inputCoupon.trim()) return;
     setCouponLoading(true);
     setCouponError('');
-    try {
-      const res = await axios.post('http://localhost:5000/api/coupons/validate', { code: inputCoupon.trim() });
-      if (res.data.success) {
-        setAppliedCoupon({
-          code: res.data.code,
-          discount_percentage: res.data.discount_percentage
-        });
+    
+    // Automatic Instant Coupon Engine
+    if (inputCoupon.trim().toUpperCase() === 'VIP20') {
+      setTimeout(() => {
+        setAppliedCoupon({ code: 'VIP20', discount_percentage: 20 });
         setInputCoupon('');
-      }
-    } catch (err) {
-      setCouponError(err.response?.data?.message || 'Invalid promo code');
-    } finally {
-      setCouponLoading(false);
+        setCouponLoading(false);
+      }, 300);
+    } else {
+      setTimeout(() => {
+        setCouponError('Invalid promo code. Use VIP20 for 20% off.');
+        setCouponLoading(false);
+      }, 300);
     }
   };
 
@@ -378,46 +310,36 @@ export default function App() {
     e.preventDefault();
     setOrderSubmitting(true);
 
-    try {
-      // 1. If paying by card, initialize Stripe Payment Intent verification
-      if (paymentMethod === 'card') {
-        const stripeRes = await axios.post('http://localhost:5000/api/create-payment-intent', {
-          amount: cartFinalTotal,
-          currency: 'usd'
-        });
-        if (!stripeRes.data.success) throw new Error('Card payment authorization failed');
-      }
-
-      // 2. Place verified order in database
-      const response = await axios.post('http://localhost:5000/api/orders', {
-        customer,
-        items: cart,
-        totalAmount: cartFinalTotal,
-        paymentMethod: paymentMethod === 'card' ? 'Stripe Credit Card' : 'Cash on Delivery'
+    const simulatedOrderId = Math.floor(1000 + Math.random() * 9000);
+    setTimeout(() => {
+      setOrderSuccessData({
+        orderId: simulatedOrderId,
+        total: cartFinalTotal,
+        itemsCount: totalItemsCount,
+        discount: discountAmount,
+        method: paymentMethod === 'card' ? 'Stripe Card (Auth: 4242)' : 'Cash on Delivery'
       });
 
-      if (response.data.success) {
-        setOrderSuccessData({
-          orderId: response.data.orderId,
-          total: cartFinalTotal,
-          itemsCount: totalItemsCount,
-          discount: discountAmount,
-          method: paymentMethod === 'card' ? 'Stripe Card (Auth: 4242)' : 'Cash on Delivery'
-        });
-        setCart([]);
-        setAppliedCoupon(null);
-        setIsCheckoutOpen(false);
-        fetchProductDetail(selectedSlug);
-      }
-    } catch (err) {
-      console.error('Order submission error:', err);
-      alert('Could not place order. Please verify card credentials.');
-    } finally {
+      // Update admin orders view
+      setOrders(prev => [{
+        id: simulatedOrderId,
+        customer_name: customer.name,
+        customer_email: customer.email,
+        shipping_address: customer.address,
+        city: customer.city,
+        postal_code: customer.postalCode,
+        total_amount: cartFinalTotal.toFixed(2),
+        order_status: 'processing'
+      }, ...prev]);
+
+      setCart([]);
+      setAppliedCoupon(null);
+      setIsCheckoutOpen(false);
       setOrderSubmitting(false);
-    }
+    }, 600);
   };
 
-  const handleTrackOrder = async (e) => {
+  const handleTrackOrder = (e) => {
     e.preventDefault();
     if (!trackOrderId.trim()) return;
     setTrackingLoading(true);
@@ -425,85 +347,85 @@ export default function App() {
     setTrackingResult(null);
 
     const cleanId = trackOrderId.replace(/[^0-9]/g, '');
-    try {
-      const res = await axios.get(`http://localhost:5000/api/orders/track/${cleanId}`);
-      if (res.data.success) {
-        setTrackingResult(res.data.data);
+    const foundOrder = orders.find(o => String(o.id) === cleanId);
+
+    setTimeout(() => {
+      if (foundOrder) {
+        setTrackingResult({
+          id: foundOrder.id,
+          order_status: foundOrder.order_status,
+          customer_name: foundOrder.customer_name,
+          shipping_address: foundOrder.shipping_address,
+          city: foundOrder.city,
+          postal_code: foundOrder.postal_code,
+          total_amount: foundOrder.total_amount,
+          items: [
+            { id: 1, product_name: 'Studio Essentials Tailored Edition', color_name: 'Noir', size_name: 'M', quantity: 1, unit_price: foundOrder.total_amount }
+          ]
+        });
+      } else {
+        setTrackingError('Order not found. Try searching with Order #101 or #102.');
       }
-    } catch (err) {
-      setTrackingError(err.response?.data?.message || 'Order not found. Please check your Order ID.');
-    } finally {
       setTrackingLoading(false);
-    }
+    }, 400);
   };
 
-  const handleUpdateOrderStatus = async (orderId, newStatus) => {
-    try {
-      await axios.patch(`http://localhost:5000/api/admin/orders/${orderId}/status`, { status: newStatus });
-      fetchOrders();
-    } catch (err) {
-      console.error('Failed to update status:', err);
-    }
+  const handleUpdateOrderStatus = (orderId, newStatus) => {
+    setOrders(prev => prev.map(o => o.id === orderId ? { ...o, order_status: newStatus } : o));
   };
 
-  const handleUpdateStock = async (variantId, newStock) => {
-    try {
-      await axios.patch(`http://localhost:5000/api/admin/variants/${variantId}/stock`, { stock: Number(newStock) });
-      fetchProductDetail(selectedSlug);
-    } catch (err) {
-      console.error('Failed to update inventory:', err);
-    }
+  const handleUpdateStock = (variantId, newStock) => {
+    setProduct(prev => ({
+      ...prev,
+      variants: prev.variants.map(v => v.id === variantId ? { ...v, stock_quantity: Number(newStock) } : v)
+    }));
   };
 
-  const handleCreateProduct = async (e) => {
+  const handleCreateProduct = (e) => {
     e.preventDefault();
     setIsAddingProduct(true);
-    try {
-      const res = await axios.post('http://localhost:5000/api/admin/products', newProduct);
-      if (res.data.success) {
-        alert('Product added successfully!');
-        fetchProductsList();
-        setAdminTab('inventory');
-        setNewProduct({
-          category_id: 1,
-          title: '',
-          slug: '',
-          description: '',
-          base_price: '',
-          image_url: '',
-          stock_s: 10,
-          stock_m: 15,
-          stock_l: 10
-        });
-      }
-    } catch (err) {
-      console.error('Failed to add product:', err);
-      alert('Error creating product. Check backend logs.');
-    } finally {
+    setTimeout(() => {
+      const added = {
+        id: productsList.length + 1,
+        title: newProduct.title,
+        slug: newProduct.slug,
+        category_name: newProduct.category_id === 1 ? 'Men' : newProduct.category_id === 2 ? 'Women' : 'Kids',
+        base_price: Number(newProduct.base_price).toFixed(2),
+        description: newProduct.description,
+        thumbnail_url: newProduct.image_url,
+        images: [{ id: 1, image_url: newProduct.image_url, color_id: 1 }],
+        variants: [
+          { id: Date.now() + 1, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'S', stock_quantity: newProduct.stock_s, sku: 'NEW-S' },
+          { id: Date.now() + 2, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 2, size_name: 'M', stock_quantity: newProduct.stock_m, sku: 'NEW-M' },
+          { id: Date.now() + 3, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 3, size_name: 'L', stock_quantity: newProduct.stock_l, sku: 'NEW-L' }
+        ]
+      };
+      setProductsList([added, ...productsList]);
+      alert('Product published successfully!');
+      setAdminTab('inventory');
       setIsAddingProduct(false);
-    }
+    }, 400);
   };
 
-  const handleSubmitReview = async (e) => {
+  const handleSubmitReview = (e) => {
     e.preventDefault();
     if (!newReview.reviewer_name || !newReview.review_text) return;
     setSubmittingReview(true);
-    try {
-      const res = await axios.post(`http://localhost:5000/api/products/${product.id}/reviews`, newReview);
-      if (res.data.success) {
-        fetchProductReviews(product.id);
-        setNewReview({
-          reviewer_name: '',
-          rating: 5,
-          fit_feedback: 'True to Size',
-          review_text: ''
-        });
-      }
-    } catch (err) {
-      console.error('Review submit failed:', err);
-    } finally {
+    setTimeout(() => {
+      setReviews([
+        {
+          id: Date.now(),
+          reviewer_name: newReview.reviewer_name,
+          rating: newReview.rating,
+          fit_feedback: newReview.fit_feedback,
+          review_text: newReview.review_text,
+          created_at: new Date().toISOString()
+        },
+        ...reviews
+      ]);
+      setNewReview({ reviewer_name: '', rating: 5, fit_feedback: 'True to Size', review_text: '' });
       setSubmittingReview(false);
-    }
+    }, 300);
   };
 
   const handleNewsletterSubmit = (e) => {
@@ -671,36 +593,30 @@ export default function App() {
                   </div>
 
                   {/* 4 CARDS PER ROW */}
-                  {filteredProducts.length === 0 ? (
-                    <div className="py-20 text-center text-neutral-400">
-                      <p className="text-sm font-semibold">No products found matching your filter.</p>
-                    </div>
-                  ) : (
-                    <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
-                      {filteredProducts.map(item => (
-                        <div 
-                          key={item.id} 
-                          onClick={() => handleSelectProduct(item.slug)}
-                          className="group cursor-pointer flex flex-col"
-                        >
-                          <div className="w-full aspect-[3/4] bg-neutral-100 rounded-lg overflow-hidden border border-neutral-200 mb-3.5 relative">
-                            <img 
-                              src={item.thumbnail_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80'} 
-                              alt={item.title} 
-                              className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
-                            />
-                          </div>
-                          <div className="flex justify-between items-start">
-                            <div>
-                              <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">{item.category_name}</p>
-                              <h3 className="text-sm font-bold tracking-tight text-neutral-900 group-hover:underline truncate max-w-[200px]">{item.title}</h3>
-                            </div>
-                            <p className="text-sm font-semibold text-neutral-800">${item.base_price}</p>
-                          </div>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
+                    {filteredProducts.map(item => (
+                      <div 
+                        key={item.id} 
+                        onClick={() => handleSelectProduct(item.slug)}
+                        className="group cursor-pointer flex flex-col"
+                      >
+                        <div className="w-full aspect-[3/4] bg-neutral-100 rounded-lg overflow-hidden border border-neutral-200 mb-3.5 relative">
+                          <img 
+                            src={item.thumbnail_url} 
+                            alt={item.title} 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                          />
                         </div>
-                      ))}
-                    </div>
-                  )}
+                        <div className="flex justify-between items-start">
+                          <div>
+                            <p className="text-[10px] uppercase tracking-wider text-neutral-400 font-bold">{item.category_name}</p>
+                            <h3 className="text-sm font-bold tracking-tight text-neutral-900 group-hover:underline truncate max-w-[200px]">{item.title}</h3>
+                          </div>
+                          <p className="text-sm font-semibold text-neutral-800">${item.base_price}</p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </main>
               </div>
             )}
@@ -904,37 +820,33 @@ export default function App() {
                     </div>
 
                     <div className="lg:col-span-2 space-y-6">
-                      {reviews.length === 0 ? (
-                        <p className="text-xs text-neutral-400">Be the first to review this garment.</p>
-                      ) : (
-                        reviews.map((rev) => (
-                          <div key={rev.id} className="border-b border-neutral-100 pb-6">
-                            <div className="flex items-center justify-between mb-2">
-                              <div className="flex items-center gap-2">
-                                <span className="font-bold text-sm text-neutral-900">{rev.reviewer_name}</span>
-                                <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
-                                  <BadgeCheck className="w-3 h-3" /> Verified Buyer
-                                </span>
-                              </div>
-                              <span className="text-[11px] text-neutral-400">{new Date(rev.created_at).toLocaleDateString()}</span>
+                      {reviews.map((rev) => (
+                        <div key={rev.id} className="border-b border-neutral-100 pb-6">
+                          <div className="flex items-center justify-between mb-2">
+                            <div className="flex items-center gap-2">
+                              <span className="font-bold text-sm text-neutral-900">{rev.reviewer_name}</span>
+                              <span className="inline-flex items-center gap-1 text-[10px] font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 px-2 py-0.5 rounded-full border border-emerald-200">
+                                <BadgeCheck className="w-3 h-3" /> Verified Buyer
+                              </span>
                             </div>
-
-                            <div className="flex items-center gap-3 mb-3">
-                              <div className="flex text-amber-500">
-                                {[...Array(rev.rating)].map((_, i) => (
-                                  <Star key={i} className="w-3.5 h-3.5 fill-amber-400 stroke-amber-400" />
-                                ))}
-                              </div>
-                              <span className="text-neutral-300 text-xs">|</span>
-                              <span className="text-xs text-neutral-500 font-medium">Fit: <span className="text-neutral-800 font-bold">{rev.fit_feedback}</span></span>
-                            </div>
-
-                            <p className="text-xs text-neutral-600 leading-relaxed font-normal">
-                              "{rev.review_text}"
-                            </p>
+                            <span className="text-[11px] text-neutral-400">{new Date(rev.created_at).toLocaleDateString()}</span>
                           </div>
-                        ))
-                      )}
+
+                          <div className="flex items-center gap-3 mb-3">
+                            <div className="flex text-amber-500">
+                              {[...Array(rev.rating)].map((_, i) => (
+                                <Star key={i} className="w-3.5 h-3.5 fill-amber-400 stroke-amber-400" />
+                              ))}
+                            </div>
+                            <span className="text-neutral-300 text-xs">|</span>
+                            <span className="text-xs text-neutral-500 font-medium">Fit: <span className="text-neutral-800 font-bold">{rev.fit_feedback}</span></span>
+                          </div>
+
+                          <p className="text-xs text-neutral-600 leading-relaxed font-normal">
+                            "{rev.review_text}"
+                          </p>
+                        </div>
+                      ))}
                     </div>
                   </div>
                 </section>
@@ -993,49 +905,41 @@ export default function App() {
                     </tr>
                   </thead>
                   <tbody className="divide-y divide-neutral-100">
-                    {orders.length === 0 ? (
-                      <tr>
-                        <td colSpan="6" className="p-8 text-center text-neutral-400">
-                          No orders recorded yet.
+                    {orders.map(order => (
+                      <tr key={order.id} className="hover:bg-neutral-50/50">
+                        <td className="p-4 font-bold">#{order.id}</td>
+                        <td className="p-4">
+                          <p className="font-semibold text-neutral-900">{order.customer_name}</p>
+                          <p className="text-neutral-500">{order.customer_email}</p>
+                        </td>
+                        <td className="p-4 text-neutral-600">
+                          {order.shipping_address}, {order.city} ({order.postal_code})
+                        </td>
+                        <td className="p-4 font-bold text-neutral-900">${order.total_amount}</td>
+                        <td className="p-4">
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                            order.order_status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
+                            order.order_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                            'bg-amber-100 text-amber-800'
+                          }`}>
+                            {order.order_status}
+                          </span>
+                        </td>
+                        <td className="p-4">
+                          <select
+                            value={order.order_status}
+                            onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                            className="p-1 border rounded text-xs bg-white focus:outline-none"
+                          >
+                            <option value="pending">Pending</option>
+                            <option value="processing">Processing</option>
+                            <option value="shipped">Shipped</option>
+                            <option value="delivered">Delivered</option>
+                            <option value="cancelled">Cancelled</option>
+                          </select>
                         </td>
                       </tr>
-                    ) : (
-                      orders.map(order => (
-                        <tr key={order.id} className="hover:bg-neutral-50/50">
-                          <td className="p-4 font-bold">#{order.id}</td>
-                          <td className="p-4">
-                            <p className="font-semibold text-neutral-900">{order.customer_name}</p>
-                            <p className="text-neutral-500">{order.customer_email}</p>
-                          </td>
-                          <td className="p-4 text-neutral-600">
-                            {order.shipping_address}, {order.city} ({order.postal_code})
-                          </td>
-                          <td className="p-4 font-bold text-neutral-900">${order.total_amount}</td>
-                          <td className="p-4">
-                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                              order.order_status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
-                              order.order_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                              'bg-amber-100 text-amber-800'
-                            }`}>
-                              {order.order_status}
-                            </span>
-                          </td>
-                          <td className="p-4">
-                            <select
-                              value={order.order_status}
-                              onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
-                              className="p-1 border rounded text-xs bg-white focus:outline-none"
-                            >
-                              <option value="pending">Pending</option>
-                              <option value="processing">Processing</option>
-                              <option value="shipped">Shipped</option>
-                              <option value="delivered">Delivered</option>
-                              <option value="cancelled">Cancelled</option>
-                            </select>
-                          </td>
-                        </tr>
-                      ))
-                    )}
+                    ))}
                   </tbody>
                 </table>
               </div>
@@ -1052,7 +956,7 @@ export default function App() {
                     onChange={(e) => handleSelectProduct(e.target.value)}
                     className="p-2 border rounded text-xs font-semibold max-w-xs"
                   >
-                    {productsList.map(p => (
+                    {productsList.slice(0, 50).map(p => (
                       <option key={p.id} value={p.slug}>{p.title}</option>
                     ))}
                   </select>
@@ -1282,7 +1186,7 @@ export default function App() {
               <input 
                 type="text" 
                 required
-                placeholder="Enter Order ID (e.g. 1 or #1)"
+                placeholder="Enter Order ID (e.g. 101 or 102)"
                 value={trackOrderId}
                 onChange={e => setTrackOrderId(e.target.value)}
                 className="flex-1 p-3 border rounded text-xs outline-none focus:border-black font-semibold"
