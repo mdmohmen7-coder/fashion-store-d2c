@@ -1,9 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import axios from 'axios';
-import { 
-  ShoppingBag, Check, ShieldCheck, RefreshCw, X, Plus, Minus, 
+import {
+  ShoppingBag, Check, ShieldCheck, RefreshCw, X, Plus, Minus,
   ArrowRight, Lock, CheckCircle2, LayoutDashboard, Store, Layers,
-  ChevronLeft, Search, SlidersHorizontal, PlusCircle, Star, BadgeCheck, 
+  ChevronLeft, Search, SlidersHorizontal, PlusCircle, Star, BadgeCheck,
   MessageSquare, Tag, Sparkles, PackageSearch, Truck, CreditCard, Banknote
 } from 'lucide-react';
 
@@ -83,9 +83,9 @@ const initialCatalog = (() => {
 })();
 
 export default function App() {
-  const [view, setView] = useState('store'); 
-  const [storeMode, setStoreMode] = useState('catalog'); 
-  const [selectedCategory, setSelectedCategory] = useState('All'); 
+  const [view, setView] = useState('store');
+  const [storeMode, setStoreMode] = useState('catalog');
+  const [selectedCategory, setSelectedCategory] = useState('All');
 
   // Filter & Search States
   const [searchQuery, setSearchQuery] = useState('');
@@ -130,7 +130,7 @@ export default function App() {
 
   // Promo Code States
   const [inputCoupon, setInputCoupon] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null); 
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
 
@@ -160,7 +160,7 @@ export default function App() {
     { id: 101, customer_name: 'Alexander Wright', customer_email: 'alex@example.com', shipping_address: '450 Lexington Ave', city: 'New York', postal_code: '10017', total_amount: '185.00', order_status: 'delivered' },
     { id: 102, customer_name: 'Elena Rostova', customer_email: 'elena@example.com', shipping_address: '12 Queen St', city: 'London', postal_code: 'W1J 5PA', total_amount: '240.00', order_status: 'shipped' }
   ]);
-  const [adminTab, setAdminTab] = useState('orders'); 
+  const [adminTab, setAdminTab] = useState('orders');
 
   // Admin New Product Form State
   const [newProduct, setNewProduct] = useState({
@@ -208,8 +208,8 @@ export default function App() {
   const filteredProducts = productsList
     .filter(p => {
       const matchesCategory = selectedCategory === 'All' || p.category_name?.toLowerCase() === selectedCategory.toLowerCase();
-      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            p.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
@@ -290,7 +290,7 @@ export default function App() {
     if (!inputCoupon.trim()) return;
     setCouponLoading(true);
     setCouponError('');
-    
+
     // Automatic Instant Coupon Engine
     if (inputCoupon.trim().toUpperCase() === 'VIP20') {
       setTimeout(() => {
@@ -436,7 +436,7 @@ export default function App() {
     }
   };
 
-  const averageRating = reviews.length > 0 
+  const averageRating = reviews.length > 0
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : '5.0';
 
@@ -449,56 +449,57 @@ export default function App() {
           <span>Complimentary worldwide shipping on orders over $150 • Use code <strong>VIP20</strong></span>
         </div>
 
-        {/* Top Universal Control Header */}
-        <header className="border-b border-neutral-200 py-3.5 px-6 sm:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-30 shadow-sm">
-          <div className="flex items-center gap-6">
+{/* Top Universal Control Header (Mobile Optimized) */}
+        <header className="border-b border-neutral-200 py-3 px-4 sm:px-10 flex justify-between items-center sticky top-0 bg-white/95 backdrop-blur-md z-30 shadow-sm">
+          <div className="flex items-center gap-2 sm:gap-6">
             <button 
               onClick={() => { setView('store'); setStoreMode('catalog'); }}
-              className="font-extrabold tracking-widest text-lg uppercase hover:opacity-80 transition-opacity"
+              className="font-extrabold tracking-wider text-xs sm:text-lg uppercase hover:opacity-80 transition-opacity whitespace-nowrap"
             >
               STUDIO ESSENTIALS
             </button>
             
-            <div className="flex items-center gap-1 bg-neutral-100 p-1 rounded-lg border border-neutral-200">
+            <div className="flex items-center gap-0.5 bg-neutral-100 p-0.5 rounded-lg border border-neutral-200">
               <button
                 onClick={() => setView('store')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold rounded-md transition-all ${
                   view === 'store' ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-600 hover:text-black'
                 }`}
               >
-                <Store className="w-3.5 h-3.5" /> Storefront
+                <Store className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden xs:inline">Store</span>
               </button>
               <button
                 onClick={() => setView('admin')}
-                className={`flex items-center gap-1.5 px-3 py-1.5 text-xs font-bold rounded-md transition-all ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-xs font-bold rounded-md transition-all ${
                   view === 'admin' ? 'bg-neutral-900 text-white shadow-sm' : 'text-neutral-600 hover:text-black'
                 }`}
               >
-                <LayoutDashboard className="w-3.5 h-3.5" /> Admin Portal
+                <LayoutDashboard className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden xs:inline">Admin</span>
               </button>
             </div>
           </div>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2">
             {view === 'store' && (
               <button 
                 onClick={() => setIsTrackingOpen(true)}
-                className="hidden sm:flex items-center gap-1.5 text-xs font-semibold tracking-wide text-neutral-600 hover:text-black px-3 py-2 rounded-full border border-neutral-200 hover:border-black transition-all"
+                className="hidden md:flex items-center gap-1.5 text-xs font-semibold tracking-wide text-neutral-600 hover:text-black px-3 py-1.5 rounded-full border border-neutral-200 hover:border-black transition-all"
               >
-                <PackageSearch className="w-3.5 h-3.5" /> Track Order
+                <PackageSearch className="w-3.5 h-3.5" /> Track
               </button>
             )}
 
             {view === 'store' ? (
               <button 
                 onClick={() => setIsCartOpen(true)}
-                className="flex items-center gap-2 text-xs font-semibold tracking-wide bg-neutral-100 hover:bg-neutral-200 px-4 py-2 rounded-full transition-all"
+                className="flex items-center gap-1.5 text-xs font-bold bg-neutral-100 hover:bg-neutral-200 px-3 py-1.5 rounded-full transition-all"
               >
-                <ShoppingBag className="w-4 h-4" /> CART ({totalItemsCount})
+                <ShoppingBag className="w-3.5 h-3.5" />
+                <span>({totalItemsCount})</span>
               </button>
             ) : (
-              <span className="text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-3 py-1.5 rounded-full">
-                ● Admin Active
+              <span className="text-[10px] sm:text-xs font-bold uppercase tracking-wider text-emerald-700 bg-emerald-50 border border-emerald-200 px-2.5 py-1 rounded-full whitespace-nowrap">
+                ● Admin
               </span>
             )}
           </div>
@@ -512,9 +513,9 @@ export default function App() {
                 {/* EDITORIAL HERO BILLBOARD */}
                 <section className="relative bg-neutral-950 text-white overflow-hidden py-20 sm:py-28 px-6 sm:px-12 border-b border-neutral-800">
                   <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-                    <img 
-                      src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80" 
-                      alt="Editorial Billboard Background" 
+                    <img
+                      src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80"
+                      alt="Editorial Billboard Background"
                       className="w-full h-full object-cover"
                     />
                   </div>
@@ -526,7 +527,7 @@ export default function App() {
                     <p className="max-w-xl text-neutral-300 text-sm sm:text-base leading-relaxed mb-8">
                       Engineered from heavyweight organic fibers, loopback terry, and Australian cashmere. Tailored for elevated daily wear across Women, Men, and Kids.
                     </p>
-                    <button 
+                    <button
                       onClick={() => {
                         const el = document.getElementById('catalog-grid-start');
                         el?.scrollIntoView({ behavior: 'smooth' });
@@ -549,8 +550,8 @@ export default function App() {
 
                       <div className="relative w-full md:w-80">
                         <Search className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="Search 200 products by title, style..."
                           value={searchQuery}
                           onChange={e => setSearchQuery(e.target.value)}
@@ -565,11 +566,10 @@ export default function App() {
                           <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-all ${
-                              selectedCategory === cat
-                                ? 'bg-neutral-900 text-white shadow-sm'
-                                : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
-                            }`}
+                            className={`px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-all ${selectedCategory === cat
+                              ? 'bg-neutral-900 text-white shadow-sm'
+                              : 'bg-neutral-100 text-neutral-600 hover:bg-neutral-200'
+                              }`}
                           >
                             {cat}
                           </button>
@@ -579,8 +579,8 @@ export default function App() {
                       <div className="flex items-center gap-2 text-xs font-bold text-neutral-600">
                         <SlidersHorizontal className="w-3.5 h-3.5" />
                         <span>SORT:</span>
-                        <select 
-                          value={sortOption} 
+                        <select
+                          value={sortOption}
                           onChange={e => setSortOption(e.target.value)}
                           className="bg-transparent font-semibold border-b border-neutral-300 pb-0.5 outline-none cursor-pointer"
                         >
@@ -595,16 +595,16 @@ export default function App() {
                   {/* 4 CARDS PER ROW */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                     {filteredProducts.map(item => (
-                      <div 
-                        key={item.id} 
+                      <div
+                        key={item.id}
                         onClick={() => handleSelectProduct(item.slug)}
                         className="group cursor-pointer flex flex-col"
                       >
                         <div className="w-full aspect-[3/4] bg-neutral-100 rounded-lg overflow-hidden border border-neutral-200 mb-3.5 relative">
-                          <img 
-                            src={item.thumbnail_url} 
-                            alt={item.title} 
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" 
+                          <img
+                            src={item.thumbnail_url}
+                            alt={item.title}
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
                           />
                         </div>
                         <div className="flex justify-between items-start">
@@ -624,7 +624,7 @@ export default function App() {
             {/* Sub-view B: Product Detail Page (PDP) */}
             {storeMode === 'product' && product && (
               <main className="max-w-6xl mx-auto px-6 py-8">
-                <button 
+                <button
                   onClick={() => setStoreMode('catalog')}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-neutral-100/80 hover:bg-neutral-200 text-neutral-700 hover:text-black rounded-full border border-neutral-200 text-xs font-bold uppercase tracking-wider transition-all mb-8 shadow-xs"
                 >
@@ -641,9 +641,8 @@ export default function App() {
                         <button
                           key={img.id}
                           onClick={() => setActiveImage(img.image_url)}
-                          className={`w-20 aspect-[3/4] rounded-md overflow-hidden border-2 transition-all ${
-                            activeImage === img.image_url ? 'border-neutral-900 ring-1 ring-neutral-900' : 'border-transparent opacity-60 hover:opacity-100'
-                          }`}
+                          className={`w-20 aspect-[3/4] rounded-md overflow-hidden border-2 transition-all ${activeImage === img.image_url ? 'border-neutral-900 ring-1 ring-neutral-900' : 'border-transparent opacity-60 hover:opacity-100'
+                            }`}
                         >
                           <img src={img.image_url} alt="Thumbnail" className="w-full h-full object-cover" />
                         </button>
@@ -675,9 +674,8 @@ export default function App() {
                             key={color.id}
                             onClick={() => handleColorChange(color.id)}
                             style={{ backgroundColor: color.hex }}
-                            className={`w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center transition-all ${
-                              selectedColor === color.id ? 'ring-2 ring-neutral-900 ring-offset-2 scale-105' : 'hover:scale-105'
-                            }`}
+                            className={`w-8 h-8 rounded-full border border-neutral-300 flex items-center justify-center transition-all ${selectedColor === color.id ? 'ring-2 ring-neutral-900 ring-offset-2 scale-105' : 'hover:scale-105'
+                              }`}
                           >
                             {selectedColor === color.id && (
                               <Check className={`w-4 h-4 ${color.hex === '#FAF9F6' ? 'text-black' : 'text-white'}`} />
@@ -705,9 +703,8 @@ export default function App() {
                               key={size.id}
                               disabled={isOutOfStock}
                               onClick={() => setSelectedSize(size.id)}
-                              className={`py-3 text-sm font-semibold rounded border transition-all ${
-                                isSelected ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-300 hover:border-black'
-                              } ${isOutOfStock ? 'opacity-30 cursor-not-allowed bg-neutral-100 line-through' : ''}`}
+                              className={`py-3 text-sm font-semibold rounded border transition-all ${isSelected ? 'border-neutral-900 bg-neutral-900 text-white' : 'border-neutral-300 hover:border-black'
+                                } ${isOutOfStock ? 'opacity-30 cursor-not-allowed bg-neutral-100 line-through' : ''}`}
                             >
                               {size.name}
                             </button>
@@ -741,7 +738,7 @@ export default function App() {
                     <div>
                       <h2 className="text-xl font-extrabold tracking-tight mb-2">Customer Feedback</h2>
                       <p className="text-xs text-neutral-500 mb-6">Verified buyer impressions on tailoring and comfort.</p>
-                      
+
                       <div className="bg-neutral-50 p-6 rounded-xl border border-neutral-200">
                         <div className="flex items-baseline gap-2 mb-2">
                           <span className="text-4xl font-extrabold tracking-tight">{averageRating}</span>
@@ -763,21 +760,21 @@ export default function App() {
                         </h3>
                         <div>
                           <label className="block font-semibold mb-1">Your Name</label>
-                          <input 
-                            type="text" 
-                            required 
+                          <input
+                            type="text"
+                            required
                             placeholder="e.g. Alex M."
                             value={newReview.reviewer_name}
-                            onChange={e => setNewReview({...newReview, reviewer_name: e.target.value})}
+                            onChange={e => setNewReview({ ...newReview, reviewer_name: e.target.value })}
                             className="w-full p-2.5 border rounded outline-none focus:border-black"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block font-semibold mb-1">Rating</label>
-                            <select 
+                            <select
                               value={newReview.rating}
-                              onChange={e => setNewReview({...newReview, rating: Number(e.target.value)})}
+                              onChange={e => setNewReview({ ...newReview, rating: Number(e.target.value) })}
                               className="w-full p-2.5 border rounded outline-none focus:border-black bg-white"
                             >
                               <option value={5}>5 Stars (Exceptional)</option>
@@ -787,9 +784,9 @@ export default function App() {
                           </div>
                           <div>
                             <label className="block font-semibold mb-1">Fit Feedback</label>
-                            <select 
+                            <select
                               value={newReview.fit_feedback}
-                              onChange={e => setNewReview({...newReview, fit_feedback: e.target.value})}
+                              onChange={e => setNewReview({ ...newReview, fit_feedback: e.target.value })}
                               className="w-full p-2.5 border rounded outline-none focus:border-black bg-white"
                             >
                               <option value="True to Size">True to Size</option>
@@ -800,17 +797,17 @@ export default function App() {
                         </div>
                         <div>
                           <label className="block font-semibold mb-1">Review</label>
-                          <textarea 
-                            rows={3} 
-                            required 
+                          <textarea
+                            rows={3}
+                            required
                             placeholder="Comment on weight, texture, drape..."
                             value={newReview.review_text}
-                            onChange={e => setNewReview({...newReview, review_text: e.target.value})}
+                            onChange={e => setNewReview({ ...newReview, review_text: e.target.value })}
                             className="w-full p-2.5 border rounded outline-none focus:border-black"
                           />
                         </div>
-                        <button 
-                          type="submit" 
+                        <button
+                          type="submit"
                           disabled={submittingReview}
                           className="w-full bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white py-3 rounded font-bold uppercase tracking-wider text-[11px]"
                         >
@@ -856,17 +853,19 @@ export default function App() {
         )}
 
         {/* VIEW 2: ADMIN MANAGEMENT PORTAL */}
+      {/* VIEW 2: ADMIN MANAGEMENT PORTAL (FULLY MOBILE RESPONSIVE) */}
         {view === 'admin' && (
-          <main className="max-w-6xl mx-auto px-6 py-10">
-            <div className="flex justify-between items-center mb-8 border-b pb-4">
+          <main className="max-w-6xl mx-auto px-4 sm:px-6 py-6 sm:py-10">
+            {/* Header & Tabs */}
+            <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 border-b pb-4">
               <div>
-                <h1 className="text-2xl font-bold tracking-tight">Store Management Portal</h1>
+                <h1 className="text-xl sm:text-2xl font-bold tracking-tight">Store Management Portal</h1>
                 <p className="text-xs text-neutral-500 mt-1">Manage orders, live inventory, and add products.</p>
               </div>
-              <div className="flex gap-2">
+              <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
                 <button
                   onClick={() => setAdminTab('orders')}
-                  className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  className={`px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${
                     adminTab === 'orders' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600'
                   }`}
                 >
@@ -874,7 +873,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setAdminTab('inventory')}
-                  className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  className={`px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${
                     adminTab === 'inventory' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600'
                   }`}
                 >
@@ -882,7 +881,7 @@ export default function App() {
                 </button>
                 <button
                   onClick={() => setAdminTab('add-product')}
-                  className={`flex items-center gap-1 px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg transition-all ${
+                  className={`flex items-center gap-1 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${
                     adminTab === 'add-product' ? 'bg-neutral-900 text-white' : 'bg-neutral-100 text-neutral-600'
                   }`}
                 >
@@ -891,41 +890,37 @@ export default function App() {
               </div>
             </div>
 
+            {/* Orders View: Responsive Card View on Mobile, Table on Desktop */}
             {adminTab === 'orders' && (
-              <div className="bg-white border rounded-xl shadow-sm overflow-hidden">
-                <table className="w-full text-left text-xs">
-                  <thead className="bg-neutral-50 border-b text-neutral-500 font-bold uppercase">
-                    <tr>
-                      <th className="p-4">Order ID</th>
-                      <th className="p-4">Customer</th>
-                      <th className="p-4">Shipping Destination</th>
-                      <th className="p-4">Total</th>
-                      <th className="p-4">Status</th>
-                      <th className="p-4">Action</th>
-                    </tr>
-                  </thead>
-                  <tbody className="divide-y divide-neutral-100">
-                    {orders.map(order => (
-                      <tr key={order.id} className="hover:bg-neutral-50/50">
-                        <td className="p-4 font-bold">#{order.id}</td>
-                        <td className="p-4">
-                          <p className="font-semibold text-neutral-900">{order.customer_name}</p>
-                          <p className="text-neutral-500">{order.customer_email}</p>
-                        </td>
-                        <td className="p-4 text-neutral-600">
-                          {order.shipping_address}, {order.city} ({order.postal_code})
-                        </td>
-                        <td className="p-4 font-bold text-neutral-900">${order.total_amount}</td>
-                        <td className="p-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+              <div>
+                {/* Mobile Cards (Hidden on sm screens and up) */}
+                <div className="block sm:hidden space-y-4">
+                  {orders.length === 0 ? (
+                    <div className="p-8 text-center text-xs text-neutral-400 bg-white border rounded-xl">
+                      No orders recorded yet.
+                    </div>
+                  ) : (
+                    orders.map(order => (
+                      <div key={order.id} className="bg-white border rounded-xl p-4 shadow-xs space-y-3">
+                        <div className="flex justify-between items-center border-b pb-2">
+                          <span className="font-extrabold text-sm text-neutral-900">Order #{order.id}</span>
+                          <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider ${
                             order.order_status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
                             order.order_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
                             'bg-amber-100 text-amber-800'
                           }`}>
                             {order.order_status}
                           </span>
-                        </td>
-                        <td className="p-4">
+                        </div>
+                        <div className="text-xs space-y-1">
+                          <p className="font-bold text-neutral-900">{order.customer_name}</p>
+                          <p className="text-neutral-500">{order.customer_email}</p>
+                          <p className="text-neutral-600 text-[11px] pt-1">
+                            {order.shipping_address}, {order.city} ({order.postal_code})
+                          </p>
+                        </div>
+                        <div className="flex justify-between items-center pt-2 border-t text-xs">
+                          <span className="font-bold text-neutral-900">Total: ${order.total_amount}</span>
                           <select
                             value={order.order_status}
                             onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
@@ -937,24 +932,77 @@ export default function App() {
                             <option value="delivered">Delivered</option>
                             <option value="cancelled">Cancelled</option>
                           </select>
-                        </td>
+                        </div>
+                      </div>
+                    ))
+                  )}
+                </div>
+
+                {/* Desktop Full Table (Hidden on Mobile) */}
+                <div className="hidden sm:block bg-white border rounded-xl shadow-xs overflow-x-auto">
+                  <table className="w-full text-left text-xs">
+                    <thead className="bg-neutral-50 border-b text-neutral-500 font-bold uppercase">
+                      <tr>
+                        <th className="p-4">Order ID</th>
+                        <th className="p-4">Customer</th>
+                        <th className="p-4">Shipping Destination</th>
+                        <th className="p-4">Total</th>
+                        <th className="p-4">Status</th>
+                        <th className="p-4">Action</th>
                       </tr>
-                    ))}
-                  </tbody>
-                </table>
+                    </thead>
+                    <tbody className="divide-y divide-neutral-100">
+                      {orders.map(order => (
+                        <tr key={order.id} className="hover:bg-neutral-50/50">
+                          <td className="p-4 font-bold">#{order.id}</td>
+                          <td className="p-4">
+                            <p className="font-semibold text-neutral-900">{order.customer_name}</p>
+                            <p className="text-neutral-500">{order.customer_email}</p>
+                          </td>
+                          <td className="p-4 text-neutral-600">
+                            {order.shipping_address}, {order.city} ({order.postal_code})
+                          </td>
+                          <td className="p-4 font-bold text-neutral-900">${order.total_amount}</td>
+                          <td className="p-4">
+                            <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
+                              order.order_status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
+                              order.order_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
+                              'bg-amber-100 text-amber-800'
+                            }`}>
+                              {order.order_status}
+                            </span>
+                          </td>
+                          <td className="p-4">
+                            <select
+                              value={order.order_status}
+                              onChange={(e) => handleUpdateOrderStatus(order.id, e.target.value)}
+                              className="p-1 border rounded text-xs bg-white focus:outline-none"
+                            >
+                              <option value="pending">Pending</option>
+                              <option value="processing">Processing</option>
+                              <option value="shipped">Shipped</option>
+                              <option value="delivered">Delivered</option>
+                              <option value="cancelled">Cancelled</option>
+                            </select>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+                </div>
               </div>
             )}
 
             {adminTab === 'inventory' && product && (
-              <div className="bg-white border rounded-xl shadow-sm overflow-hidden p-6">
-                <div className="flex justify-between items-center mb-6">
-                  <h2 className="text-sm font-bold uppercase tracking-wider flex items-center gap-2">
+              <div className="bg-white border rounded-xl shadow-xs p-4 sm:p-6">
+                <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-3 mb-6">
+                  <h2 className="text-xs sm:text-sm font-bold uppercase tracking-wider flex items-center gap-2">
                     <Layers className="w-4 h-4" /> Live Variant Stock Levels
                   </h2>
                   <select 
                     value={selectedSlug} 
                     onChange={(e) => handleSelectProduct(e.target.value)}
-                    className="p-2 border rounded text-xs font-semibold max-w-xs"
+                    className="p-2 border rounded text-xs font-semibold w-full sm:max-w-xs"
                   >
                     {productsList.slice(0, 50).map(p => (
                       <option key={p.id} value={p.slug}>{p.title}</option>
@@ -962,7 +1010,7 @@ export default function App() {
                   </select>
                 </div>
 
-                <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                   {product.variants.map(variant => (
                     <div key={variant.id} className="border p-4 rounded-lg flex justify-between items-center">
                       <div>
@@ -986,8 +1034,8 @@ export default function App() {
             )}
 
             {adminTab === 'add-product' && (
-              <div className="bg-white border rounded-xl shadow-sm p-8 max-w-2xl">
-                <h2 className="text-xl font-bold tracking-tight mb-2">Create New Storefront Product</h2>
+              <div className="bg-white border rounded-xl shadow-xs p-5 sm:p-8 max-w-2xl">
+                <h2 className="text-lg sm:text-xl font-bold tracking-tight mb-2">Create New Storefront Product</h2>
                 <p className="text-xs text-neutral-500 mb-6">Publish a new luxury piece directly to your live marketplace without SQL.</p>
 
                 <form onSubmit={handleCreateProduct} className="space-y-4 text-xs">
@@ -1007,7 +1055,7 @@ export default function App() {
                     />
                   </div>
 
-                  <div className="grid grid-cols-2 gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
                       <label className="block font-bold uppercase mb-1">Target Category</label>
                       <select 
@@ -1060,9 +1108,9 @@ export default function App() {
 
                   <div>
                     <label className="block font-bold uppercase mb-2">Initial Stock Allocation by Size</label>
-                    <div className="grid grid-cols-3 gap-3">
+                    <div className="grid grid-cols-3 gap-2 sm:gap-3">
                       <div>
-                        <span className="text-neutral-500 font-semibold">Size Small:</span>
+                        <span className="text-neutral-500 font-semibold text-[11px]">Size S:</span>
                         <input 
                           type="number" 
                           value={newProduct.stock_s}
@@ -1071,7 +1119,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <span className="text-neutral-500 font-semibold">Size Medium:</span>
+                        <span className="text-neutral-500 font-semibold text-[11px]">Size M:</span>
                         <input 
                           type="number" 
                           value={newProduct.stock_m}
@@ -1080,7 +1128,7 @@ export default function App() {
                         />
                       </div>
                       <div>
-                        <span className="text-neutral-500 font-semibold">Size Large:</span>
+                        <span className="text-neutral-500 font-semibold text-[11px]">Size L:</span>
                         <input 
                           type="number" 
                           value={newProduct.stock_l}
@@ -1113,14 +1161,14 @@ export default function App() {
             <p className="text-neutral-400 max-w-sm leading-relaxed mb-6">
               A design atelier dedicated to pure materiality, tailored drapery, and elevated everyday silhouettes. Made for permanent rotation.
             </p>
-            
+
             <form onSubmit={handleNewsletterSubmit} className="max-w-sm">
               <span className="text-[11px] font-bold uppercase tracking-wider text-neutral-300 block mb-2">Join the VIP Atelier Circle</span>
               <div className="flex gap-2">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   required
-                  placeholder="Enter your email" 
+                  placeholder="Enter your email"
                   value={newsletterEmail}
                   onChange={e => setNewsletterEmail(e.target.value)}
                   className="bg-neutral-900 border border-neutral-700 rounded px-3 py-2 text-xs flex-1 outline-none focus:border-white text-white"
@@ -1170,7 +1218,7 @@ export default function App() {
       {isTrackingOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative text-neutral-900">
-            <button 
+            <button
               onClick={() => { setIsTrackingOpen(false); setTrackingResult(null); setTrackingError(''); }}
               className="absolute top-5 right-5 p-2 rounded-full hover:bg-neutral-100"
             >
@@ -1183,16 +1231,16 @@ export default function App() {
             <h2 className="text-2xl font-bold tracking-tight mb-4">Track Your Shipment</h2>
 
             <form onSubmit={handleTrackOrder} className="flex gap-2 mb-6">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 required
                 placeholder="Enter Order ID (e.g. 101 or 102)"
                 value={trackOrderId}
                 onChange={e => setTrackOrderId(e.target.value)}
                 className="flex-1 p-3 border rounded text-xs outline-none focus:border-black font-semibold"
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={trackingLoading}
                 className="bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white px-5 py-3 rounded text-xs font-bold uppercase tracking-wider"
               >
@@ -1213,11 +1261,10 @@ export default function App() {
                     <span className="text-neutral-400 uppercase text-[10px] font-bold">Order Number</span>
                     <p className="font-extrabold text-base">#{trackingResult.id}</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    trackingResult.order_status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${trackingResult.order_status === 'delivered' ? 'bg-emerald-100 text-emerald-800' :
                     trackingResult.order_status === 'shipped' ? 'bg-blue-100 text-blue-800' :
-                    'bg-amber-100 text-amber-800'
-                  }`}>
+                      'bg-amber-100 text-amber-800'
+                    }`}>
                     {trackingResult.order_status}
                   </span>
                 </div>
@@ -1252,7 +1299,7 @@ export default function App() {
 
       {/* Cart Drawer */}
       {isCartOpen && (
-        <div 
+        <div
           onClick={() => setIsCartOpen(false)}
           className="fixed inset-0 bg-black/40 backdrop-blur-sm z-40 transition-opacity"
         />
@@ -1303,7 +1350,7 @@ export default function App() {
               <span className="text-sm text-neutral-600">Subtotal</span>
               <span className="text-lg font-bold">${cartSubtotal.toFixed(2)}</span>
             </div>
-            <button 
+            <button
               onClick={() => {
                 setIsCartOpen(false);
                 setIsCheckoutOpen(true);
@@ -1320,7 +1367,7 @@ export default function App() {
       {isCheckoutOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
           <div className="bg-white rounded-xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative">
-            <button 
+            <button
               onClick={() => setIsCheckoutOpen(false)}
               className="absolute top-5 right-5 p-2 rounded-full hover:bg-neutral-100"
             >
@@ -1337,16 +1384,16 @@ export default function App() {
               <form onSubmit={handleApplyCoupon} className="flex gap-2">
                 <div className="relative flex-1">
                   <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Promo Code (e.g. VIP20)"
                     value={inputCoupon}
                     onChange={e => setInputCoupon(e.target.value.toUpperCase())}
                     className="w-full pl-9 pr-3 py-2 text-xs uppercase font-bold tracking-wider border rounded outline-none focus:border-black bg-white"
                   />
                 </div>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={couponLoading || !inputCoupon}
                   className="bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-300 text-white px-4 py-2 rounded text-xs font-bold uppercase tracking-wider"
                 >
@@ -1369,12 +1416,12 @@ export default function App() {
             <form onSubmit={handlePlaceOrder} className="space-y-4">
               <div>
                 <label className="block text-xs font-bold uppercase mb-1">Full Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   placeholder="John Doe"
                   value={customer.name}
-                  onChange={e => setCustomer({...customer, name: e.target.value})}
+                  onChange={e => setCustomer({ ...customer, name: e.target.value })}
                   className="w-full p-2.5 border rounded text-xs focus:border-black outline-none"
                 />
               </div>
@@ -1382,23 +1429,23 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase mb-1">Email</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     required
                     placeholder="john@example.com"
                     value={customer.email}
-                    onChange={e => setCustomer({...customer, email: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, email: e.target.value })}
                     className="w-full p-2.5 border rounded text-xs focus:border-black outline-none"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase mb-1">Phone</label>
-                  <input 
-                    type="tel" 
+                  <input
+                    type="tel"
                     required
                     placeholder="+1 (555) 000-0000"
                     value={customer.phone}
-                    onChange={e => setCustomer({...customer, phone: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, phone: e.target.value })}
                     className="w-full p-2.5 border rounded text-xs focus:border-black outline-none"
                   />
                 </div>
@@ -1406,12 +1453,12 @@ export default function App() {
 
               <div>
                 <label className="block text-xs font-bold uppercase mb-1">Address</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   placeholder="742 Evergreen Terrace"
                   value={customer.address}
-                  onChange={e => setCustomer({...customer, address: e.target.value})}
+                  onChange={e => setCustomer({ ...customer, address: e.target.value })}
                   className="w-full p-2.5 border rounded text-xs focus:border-black outline-none"
                 />
               </div>
@@ -1419,23 +1466,23 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block text-xs font-bold uppercase mb-1">City</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     required
                     placeholder="New York"
                     value={customer.city}
-                    onChange={e => setCustomer({...customer, city: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, city: e.target.value })}
                     className="w-full p-2.5 border rounded text-xs focus:border-black outline-none"
                   />
                 </div>
                 <div>
                   <label className="block text-xs font-bold uppercase mb-1">Postal Code</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     required
                     placeholder="10001"
                     value={customer.postalCode}
-                    onChange={e => setCustomer({...customer, postalCode: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, postalCode: e.target.value })}
                     className="w-full p-2.5 border rounded text-xs focus:border-black outline-none"
                   />
                 </div>
@@ -1448,18 +1495,16 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3 border rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${
-                      paymentMethod === 'card' ? 'border-black bg-neutral-900 text-white' : 'border-neutral-200 text-neutral-600 hover:border-black'
-                    }`}
+                    className={`p-3 border rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${paymentMethod === 'card' ? 'border-black bg-neutral-900 text-white' : 'border-neutral-200 text-neutral-600 hover:border-black'
+                      }`}
                   >
                     <CreditCard className="w-4 h-4" /> Credit Card (Stripe)
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('cod')}
-                    className={`p-3 border rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${
-                      paymentMethod === 'cod' ? 'border-black bg-neutral-900 text-white' : 'border-neutral-200 text-neutral-600 hover:border-black'
-                    }`}
+                    className={`p-3 border rounded-lg flex items-center justify-center gap-2 text-xs font-bold transition-all ${paymentMethod === 'cod' ? 'border-black bg-neutral-900 text-white' : 'border-neutral-200 text-neutral-600 hover:border-black'
+                      }`}
                   >
                     <Banknote className="w-4 h-4" /> Cash on Delivery
                   </button>
@@ -1473,27 +1518,27 @@ export default function App() {
                       <span className="text-emerald-600 flex items-center gap-1"><Lock className="w-2.5 h-2.5" /> 256-Bit SSL</span>
                     </div>
                     <div>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={cardDetails.cardNumber}
-                        onChange={e => setCardDetails({...cardDetails, cardNumber: e.target.value})}
+                        onChange={e => setCardDetails({ ...cardDetails, cardNumber: e.target.value })}
                         className="w-full p-2.5 bg-white border rounded text-xs font-mono font-semibold focus:border-black outline-none tracking-widest"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={cardDetails.cardExp}
-                        onChange={e => setCardDetails({...cardDetails, cardExp: e.target.value})}
+                        onChange={e => setCardDetails({ ...cardDetails, cardExp: e.target.value })}
                         className="p-2.5 bg-white border rounded text-xs font-mono font-semibold focus:border-black outline-none text-center"
                       />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={cardDetails.cardCvc}
-                        onChange={e => setCardDetails({...cardDetails, cardCvc: e.target.value})}
+                        onChange={e => setCardDetails({ ...cardDetails, cardCvc: e.target.value })}
                         className="p-2.5 bg-white border rounded text-xs font-mono font-semibold focus:border-black outline-none text-center"
                       />
                     </div>
@@ -1519,15 +1564,15 @@ export default function App() {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={orderSubmitting}
                 className="w-full bg-neutral-900 hover:bg-neutral-800 disabled:bg-neutral-400 text-white py-3.5 rounded font-bold uppercase tracking-wider text-xs mt-2"
               >
-                {orderSubmitting 
-                  ? 'Authorizing Transaction...' 
-                  : paymentMethod === 'card' 
-                    ? `Pay with Card ($${cartFinalTotal.toFixed(2)})` 
+                {orderSubmitting
+                  ? 'Authorizing Transaction...'
+                  : paymentMethod === 'card'
+                    ? `Pay with Card ($${cartFinalTotal.toFixed(2)})`
                     : `Confirm Cash Order ($${cartFinalTotal.toFixed(2)})`}
               </button>
             </form>
@@ -1568,7 +1613,7 @@ export default function App() {
                 <span className="text-neutral-900">${orderSuccessData.total.toFixed(2)}</span>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => { setOrderSuccessData(null); setStoreMode('catalog'); }}
               className="w-full bg-neutral-900 hover:bg-neutral-800 text-white py-3 rounded font-bold uppercase text-xs tracking-wider"
             >
