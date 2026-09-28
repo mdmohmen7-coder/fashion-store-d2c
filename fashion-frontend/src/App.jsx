@@ -194,19 +194,21 @@ export default function App() {
       .catch(() => {});
   }, []);
 
-  const handleSelectProduct = (slug) => {
+ const handleSelectProduct = (slug) => {
     setSelectedSlug(slug);
     const found = productsList.find(p => p.slug === slug);
     if (found) {
       setProduct(found);
       if (found.variants && found.variants.length > 0) {
         setSelectedColor(found.variants[0].color_id);
+      } else {
+        setSelectedColor(1);
       }
-      setActiveImage(found.thumbnail_url || found.images?.[0]?.image_url);
+      setActiveImage(found.thumbnail_url || found.images?.[0]?.image_url || '');
       setSelectedSize(null);
+      setStoreMode('product');
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     }
-    setStoreMode('product');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
   const handleNavCategory = (catName) => {
