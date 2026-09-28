@@ -839,11 +839,11 @@ export default function App() {
                     </div>
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      {/* Department switcher inside catalog without 'All' */}
-                      <div className="flex items-center gap-2 overflow-x-auto pb-1">
+                     {/* Department switcher inside catalog without 'All' (Mobile Scrollable) */}
+                      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full sm:w-auto -mx-2 px-2">
                         <button
                           onClick={() => setSelectedCategory('Featured')}
-                          className={`px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-all ${
+                          className={`px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${
                             selectedCategory === 'Featured'
                               ? 'bg-white text-black shadow-lg shadow-white/15'
                               : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
@@ -855,7 +855,7 @@ export default function App() {
                           <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-5 py-2 text-xs font-bold uppercase tracking-widest rounded-full transition-all ${
+                            className={`px-4 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${
                               selectedCategory === cat
                                 ? 'bg-white text-black shadow-lg shadow-white/15'
                                 : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
