@@ -510,32 +510,61 @@ export default function App() {
           <div>
             {storeMode === 'catalog' && (
               <div>
-                {/* EDITORIAL HERO BILLBOARD */}
-                <section className="relative bg-neutral-950 text-white overflow-hidden py-20 sm:py-28 px-6 sm:px-12 border-b border-neutral-800">
-                  <div className="absolute inset-0 opacity-40 mix-blend-overlay">
-                    <img
-                      src="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80"
-                      alt="Editorial Billboard Background"
-                      className="w-full h-full object-cover"
-                    />
+                {/* EDITORIAL CINEMATIC VIDEO HERO BILLBOARD */}
+                <section className="relative bg-neutral-950 text-white overflow-hidden py-24 sm:py-36 px-6 sm:px-12 border-b border-neutral-800">
+                  {/* High Quality Streaming Fashion Runway Video Background */}
+                  <div className="absolute inset-0 z-0">
+                    <video
+                      autoPlay
+                      loop
+                      muted
+                      playsInline
+                      poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80"
+                      className="w-full h-full object-cover opacity-45 mix-blend-screen scale-105"
+                    >
+                      {/* CDN Hosted Fashion Runway Loop Video */}
+                      <source 
+                        src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-runway-show-41484-large.mp4" 
+                        type="video/mp4" 
+                      />
+                      Your browser does not support the video tag.
+                    </video>
+                    {/* Editorial Gradient Overlay for Text Readability */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-neutral-950 via-neutral-950/40 to-neutral-950/70" />
                   </div>
-                  <div className="relative max-w-5xl mx-auto flex flex-col items-center text-center">
-                    <span className="text-xs font-bold tracking-[0.3em] uppercase text-neutral-400 mb-4">Edition 01 / Full 200 Atelier Collection</span>
-                    <h1 className="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-                      Structured Silhouettes. <br /> Uncompromising Comfort.
+
+                  <div className="relative z-10 max-w-5xl mx-auto flex flex-col items-center text-center">
+                    <span className="text-[11px] sm:text-xs font-bold tracking-[0.3em] uppercase text-neutral-300 mb-4 bg-white/10 backdrop-blur-md px-4 py-1.5 rounded-full border border-white/15">
+                      Edition 01 / Autumn Runway Archive
+                    </span>
+                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight drop-shadow-md">
+                      Structured Silhouettes. <br /> 
+                      <span className="text-neutral-300 font-serif italic font-normal">Cinematic Precision.</span>
                     </h1>
-                    <p className="max-w-xl text-neutral-300 text-sm sm:text-base leading-relaxed mb-8">
+                    <p className="max-w-xl text-neutral-200 text-sm sm:text-base leading-relaxed mb-8 drop-shadow-sm font-light">
                       Engineered from heavyweight organic fibers, loopback terry, and Australian cashmere. Tailored for elevated daily wear across Women, Men, and Kids.
                     </p>
-                    <button
-                      onClick={() => {
-                        const el = document.getElementById('catalog-grid-start');
-                        el?.scrollIntoView({ behavior: 'smooth' });
-                      }}
-                      className="bg-white text-neutral-950 hover:bg-neutral-200 px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all"
-                    >
-                      Explore 200 Products
-                    </button>
+                    <div className="flex flex-col sm:flex-row items-center gap-4">
+                      <button 
+                        onClick={() => {
+                          const el = document.getElementById('catalog-grid-start');
+                          el?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="w-full sm:w-auto bg-white text-neutral-950 hover:bg-neutral-200 px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all shadow-xl hover:scale-105"
+                      >
+                        Explore 200 Products
+                      </button>
+                      <button 
+                        onClick={() => {
+                          setSelectedCategory('Women');
+                          const el = document.getElementById('catalog-grid-start');
+                          el?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="w-full sm:w-auto bg-white/10 hover:bg-white/20 backdrop-blur-md text-white border border-white/20 px-8 py-3.5 rounded-full text-xs font-bold uppercase tracking-widest transition-all"
+                      >
+                        Watch Runway Drop
+                      </button>
+                    </div>
                   </div>
                 </section>
 
