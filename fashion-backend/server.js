@@ -8,16 +8,32 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// 0. Get All Products (Storefront Collection)
+app.get('/api/products', async (req, res) => {
+  try {
+    const [products] = await pool.query(`
+      SELECT p.*, c.name AS category_name,
+        (SELECT image_url FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS thumbnail_url
+      FROM products p
+      LEFT JOIN categories c ON p.category_id = c.id
+      ORDER BY p.id ASC
+    `);
+    res.json({ success: true, data: products });
+  } catch (error) {
+    console.error('Error fetching all products:', error);
+    res.status(500).json({ success: false, message: error.message });
+  }
+});
+
 // 1. Get Product by Slug (With variants and images)
 app.get('/api/products/:slug', async (req, res) => {
   try {
     const { slug } = req.params;
 
-    // Fetch product details
     const [products] = await pool.query(
       `SELECT p.*, c.name AS category_name 
        FROM products p 
-       JOIN categories c ON p.category_id = c.id 
+       LEFT JOIN categories c ON p.category_id = c.id 
        WHERE p.slug = ?`, 
       [slug]
     );
@@ -28,19 +44,17 @@ app.get('/api/products/:slug', async (req, res) => {
 
     const product = products[0];
 
-    // Fetch variants with joined color and size names (removed price_adjustment)
     const [variants] = await pool.query(
       `SELECT pv.id, pv.sku, pv.stock_quantity,
               cl.id AS color_id, cl.name AS color_name, cl.hex_code,
               sz.id AS size_id, sz.name AS size_name
        FROM product_variants pv
-       JOIN colors cl ON pv.color_id = cl.id
-       JOIN sizes sz ON pv.size_id = sz.id
+       LEFT JOIN colors cl ON pv.color_id = cl.id
+       LEFT JOIN sizes sz ON pv.size_id = sz.id
        WHERE pv.product_id = ?`,
       [product.id]
     );
 
-    // Fetch images mapped to colors
     const [images] = await pool.query(
       `SELECT id, color_id, image_url, is_primary 
        FROM product_images 
@@ -58,7 +72,7 @@ app.get('/api/products/:slug', async (req, res) => {
     });
   } catch (error) {
     console.error('Error fetching product:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
+    res.status(500).json({ success: false, message: error.message });
   }
 });
 
@@ -126,22 +140,7 @@ app.post('/api/orders', async (req, res) => {
     connection.release();
   }
 });
-// 0. Get All Products (For Storefront Collection Grid)
-app.get('/api/products', async (req, res) => {
-  try {
-    const [products] = await pool.query(`
-      SELECT p.*, c.name AS category_name,
-        (SELECT image_url FROM product_images WHERE product_id = p.id AND is_primary = 1 LIMIT 1) AS thumbnail_url
-      FROM products p
-      LEFT JOIN categories c ON p.category_id = c.id
-      ORDER BY p.id ASC
-    `);
-    res.json({ success: true, data: products });
-  } catch (error) {
-    console.error('Error fetching all products:', error);
-    res.status(500).json({ success: false, message: 'Server error' });
-  }
-});
+
 // 3. Admin: Get All Orders API
 app.get('/api/admin/orders', async (req, res) => {
   try {
@@ -189,7 +188,6 @@ app.post('/api/admin/products', async (req, res) => {
 
     const { category_id, title, slug, description, base_price, image_url, stock_s, stock_m, stock_l } = req.body;
 
-    // 1. Insert product
     const [prodResult] = await connection.query(
       `INSERT INTO products (category_id, title, slug, description, base_price) 
        VALUES (?, ?, ?, ?, ?)`,
@@ -197,14 +195,12 @@ app.post('/api/admin/products', async (req, res) => {
     );
     const newProductId = prodResult.insertId;
 
-    // 2. Insert primary image (mapped to Black/Onyx color ID: 1)
     await connection.query(
       `INSERT INTO product_images (product_id, color_id, image_url, is_primary) 
        VALUES (?, 1, ?, 1)`,
       [newProductId, image_url]
     );
 
-    // 3. Create default size variants (S: 1, M: 2, L: 3)
     const variants = [
       { size_id: 1, sku: `${slug.substring(0, 4).toUpperCase()}-BLK-S`, stock: stock_s || 10 },
       { size_id: 2, sku: `${slug.substring(0, 4).toUpperCase()}-BLK-M`, stock: stock_m || 15 },
@@ -288,7 +284,7 @@ app.post('/api/coupons/validate', async (req, res) => {
   }
 });
 
-// 10. Track / Lookup Order by ID (Customer Self-Service)
+// 10. Track / Lookup Order by ID
 app.get('/api/orders/track/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -314,13 +310,12 @@ app.get('/api/orders/track/:id', async (req, res) => {
   }
 });
 
-// 11. Stripe Payment Intent Initialization & Card Verification
+// 11. Stripe Payment Intent
 app.post('/api/create-payment-intent', async (req, res) => {
   try {
     const { amount, currency } = req.body;
     const amountInCents = Math.round(Number(amount) * 100);
 
-    // Creates a payment intent token for checkout authorization
     res.json({
       success: true,
       clientSecret: `pi_test_${Date.now()}_secret_${Math.random().toString(36).substring(7)}`,
@@ -334,9 +329,15 @@ app.post('/api/create-payment-intent', async (req, res) => {
   }
 });
 
+// Global Error Handler
+process.on('uncaughtException', (err) => {
+  console.error('UNCAUGHT EXCEPTION:', err);
+});
+process.on('unhandledRejection', (reason, promise) => {
+  console.error('UNHANDLED REJECTION:', reason);
+});
 
 const PORT = process.env.PORT || 5000;
 app.listen(PORT, () => {
   console.log(`Server running on http://localhost:${PORT}`);
 });
-
