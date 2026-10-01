@@ -1,9 +1,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import axios from 'axios';
-import { 
-  ShoppingBag, Check, ShieldCheck, RefreshCw, X, Plus, Minus, 
+import {
+  ShoppingBag, Check, ShieldCheck, RefreshCw, X, Plus, Minus,
   ArrowRight, Lock, CheckCircle2, LayoutDashboard, Store, Layers,
-  ChevronLeft, Search, SlidersHorizontal, PlusCircle, Star, BadgeCheck, 
+  ChevronLeft, Search, SlidersHorizontal, PlusCircle, Star, BadgeCheck,
   MessageSquare, Tag, Sparkles, PackageSearch, Truck, CreditCard, Banknote,
   Volume2, VolumeX, Play, Pause, Eye, Award, Feather, Compass
 } from 'lucide-react';
@@ -81,9 +81,9 @@ const initialCatalog = (() => {
 })();
 
 export default function App() {
-  const [view, setView] = useState('store'); 
-  const [storeMode, setStoreMode] = useState('catalog'); 
-  const [selectedCategory, setSelectedCategory] = useState('Featured'); 
+  const [view, setView] = useState('store');
+  const [storeMode, setStoreMode] = useState('catalog');
+  const [selectedCategory, setSelectedCategory] = useState('Featured');
 
   // Filter & Search States
   const [searchQuery, setSearchQuery] = useState('');
@@ -135,7 +135,7 @@ export default function App() {
 
   // Promo Code States
   const [inputCoupon, setInputCoupon] = useState('');
-  const [appliedCoupon, setAppliedCoupon] = useState(null); 
+  const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
 
@@ -165,7 +165,7 @@ export default function App() {
     { id: 101, customer_name: 'Alexander Wright', customer_email: 'alex@example.com', shipping_address: '450 Lexington Ave', city: 'New York', postal_code: '10017', total_amount: '185.00', order_status: 'delivered' },
     { id: 102, customer_name: 'Elena Rostova', customer_email: 'elena@example.com', shipping_address: '12 Queen St', city: 'London', postal_code: 'W1J 5PA', total_amount: '240.00', order_status: 'shipped' }
   ]);
-  const [adminTab, setAdminTab] = useState('orders'); 
+  const [adminTab, setAdminTab] = useState('orders');
 
   // Admin New Product Form State
   const [newProduct, setNewProduct] = useState({
@@ -182,14 +182,18 @@ export default function App() {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
   useEffect(() => {
-    axios.get('http://localhost:5000/api/products', { timeout: 1000 })
+    axios.get('https://fashion-backend-7149.onrender.com/api/products', { timeout: 60000 })
       .then(res => {
-        if (res.data?.data && res.data.data.length > 0) {
-          setProductsList(res.data.data);
-          setSelectedSlug(res.data.data[0].slug);
+        // Backend theke direct array ba res.data.data 2 tai handle korbe
+        const products = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        if (products.length > 0) {
+          setProductsList(products);
+          setSelectedSlug(products[0].slug);
         }
       })
-      .catch(() => {});
+      .catch(err => {
+        console.error('Fetch error:', err);
+      });
   }, []);
 
   const handleSelectProduct = (slug) => {
@@ -220,11 +224,11 @@ export default function App() {
   // Filter products: On 'Featured' show top attractive items, otherwise show Women / Men / Kids
   const filteredProducts = productsList
     .filter(p => {
-      const matchesCategory = selectedCategory === 'Featured' 
-        ? p.is_featured 
+      const matchesCategory = selectedCategory === 'Featured'
+        ? p.is_featured
         : p.category_name?.toLowerCase() === selectedCategory.toLowerCase();
-      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) || 
-                            p.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        p.description?.toLowerCase().includes(searchQuery.toLowerCase());
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
@@ -322,7 +326,7 @@ export default function App() {
     if (!inputCoupon.trim()) return;
     setCouponLoading(true);
     setCouponError('');
-    
+
     if (inputCoupon.trim().toUpperCase() === 'VIP20') {
       setTimeout(() => {
         setAppliedCoupon({ code: 'VIP20', discount_percentage: 20 });
@@ -467,7 +471,7 @@ export default function App() {
     }
   };
 
-  const averageRating = reviews.length > 0 
+  const averageRating = reviews.length > 0
     ? (reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length).toFixed(1)
     : '5.0';
 
@@ -484,7 +488,7 @@ export default function App() {
         <header className="sticky top-0 z-40 bg-[#070b12]/85 backdrop-blur-xl border-b border-white/10 py-3.5 px-4 sm:px-10 flex justify-between items-center transition-all">
           <div className="flex items-center gap-4 sm:gap-10">
             {/* Logo */}
-            <button 
+            <button
               onClick={() => { setView('store'); setStoreMode('catalog'); setSelectedCategory('Featured'); }}
               className="group flex items-center gap-2.5 text-left"
             >
@@ -500,46 +504,42 @@ export default function App() {
                 </span>
               </div>
             </button>
-            
+
             {/* Direct Collections Navbar: WOMEN, MEN, KIDS */}
             <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
               <button
                 onClick={() => { setView('store'); setStoreMode('catalog'); setSelectedCategory('Featured'); }}
-                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${
-                  selectedCategory === 'Featured' && view === 'store'
-                    ? 'text-amber-300 bg-white/10' 
+                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Featured' && view === 'store'
+                    ? 'text-amber-300 bg-white/10'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Atelier Home
               </button>
               <button
                 onClick={() => handleNavCategory('Women')}
-                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${
-                  selectedCategory === 'Women' && view === 'store'
-                    ? 'text-amber-300 bg-white/10' 
+                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Women' && view === 'store'
+                    ? 'text-amber-300 bg-white/10'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Women
               </button>
               <button
                 onClick={() => handleNavCategory('Men')}
-                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${
-                  selectedCategory === 'Men' && view === 'store'
-                    ? 'text-amber-300 bg-white/10' 
+                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Men' && view === 'store'
+                    ? 'text-amber-300 bg-white/10'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Men
               </button>
               <button
                 onClick={() => handleNavCategory('Kids')}
-                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${
-                  selectedCategory === 'Kids' && view === 'store'
-                    ? 'text-amber-300 bg-white/10' 
+                className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Kids' && view === 'store'
+                    ? 'text-amber-300 bg-white/10'
                     : 'text-slate-300 hover:text-white hover:bg-white/5'
-                }`}
+                  }`}
               >
                 Kids
               </button>
@@ -551,24 +551,22 @@ export default function App() {
             <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => { setView('store'); setSelectedCategory('Featured'); }}
-                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase rounded-lg transition-all ${
-                  view === 'store' ? 'bg-white text-black shadow-lg shadow-white/10' : 'text-slate-400 hover:text-white'
-                }`}
+                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase rounded-lg transition-all ${view === 'store' ? 'bg-white text-black shadow-lg shadow-white/10' : 'text-slate-400 hover:text-white'
+                  }`}
               >
                 <Store className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Store</span>
               </button>
               <button
                 onClick={() => setView('admin')}
-                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase rounded-lg transition-all ${
-                  view === 'admin' ? 'bg-white text-black shadow-lg shadow-white/10' : 'text-slate-400 hover:text-white'
-                }`}
+                className={`flex items-center gap-1 px-2.5 sm:px-3 py-1 sm:py-1.5 text-[10px] sm:text-[11px] font-bold tracking-wider uppercase rounded-lg transition-all ${view === 'admin' ? 'bg-white text-black shadow-lg shadow-white/10' : 'text-slate-400 hover:text-white'
+                  }`}
               >
                 <LayoutDashboard className="w-3 h-3 sm:w-3.5 sm:h-3.5" /> <span className="hidden sm:inline">Admin</span>
               </button>
             </div>
 
             {view === 'store' && (
-              <button 
+              <button
                 onClick={() => setIsTrackingOpen(true)}
                 className="hidden lg:flex items-center gap-1.5 text-xs font-semibold tracking-wider uppercase text-slate-300 hover:text-white px-3 py-1.5 rounded-full border border-white/15 hover:border-white/40 transition-all bg-white/5 backdrop-blur-md"
               >
@@ -577,11 +575,11 @@ export default function App() {
             )}
 
             {view === 'store' ? (
-              <button 
+              <button
                 onClick={() => setIsCartOpen(true)}
                 className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider bg-white text-black hover:bg-neutral-200 px-3.5 sm:px-4 py-1.5 sm:py-2 rounded-full transition-all shadow-lg shadow-white/10"
               >
-                <ShoppingBag className="w-3.5 h-3.5" /> 
+                <ShoppingBag className="w-3.5 h-3.5" />
                 <span>BAG ({totalItemsCount})</span>
               </button>
             ) : (
@@ -596,25 +594,25 @@ export default function App() {
         {/* Mobile Secondary Category Navigation Bar */}
         {view === 'store' && (
           <div className="flex md:hidden items-center justify-around bg-black/60 border-b border-white/10 py-2.5 px-4 backdrop-blur-md">
-            <button 
+            <button
               onClick={() => { setSelectedCategory('Featured'); setStoreMode('catalog'); }}
               className={`text-[11px] font-bold uppercase tracking-wider transition ${selectedCategory === 'Featured' ? 'text-amber-300 border-b border-amber-300' : 'text-slate-400'}`}
             >
               Atelier Home
             </button>
-            <button 
+            <button
               onClick={() => handleNavCategory('Women')}
               className={`text-[11px] font-bold uppercase tracking-wider transition ${selectedCategory === 'Women' ? 'text-amber-300 border-b border-amber-300' : 'text-slate-400'}`}
             >
               Women
             </button>
-            <button 
+            <button
               onClick={() => handleNavCategory('Men')}
               className={`text-[11px] font-bold uppercase tracking-wider transition ${selectedCategory === 'Men' ? 'text-amber-300 border-b border-amber-300' : 'text-slate-400'}`}
             >
               Men
             </button>
-            <button 
+            <button
               onClick={() => handleNavCategory('Kids')}
               className={`text-[11px] font-bold uppercase tracking-wider transition ${selectedCategory === 'Kids' ? 'text-amber-300 border-b border-amber-300' : 'text-slate-400'}`}
             >
@@ -641,9 +639,9 @@ export default function App() {
                       poster="https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=1600&q=80"
                       className="w-full h-full object-cover opacity-45 mix-blend-screen scale-105 transition-all duration-700"
                     >
-                      <source 
-                        src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-runway-show-41484-large.mp4" 
-                        type="video/mp4" 
+                      <source
+                        src="https://assets.mixkit.co/videos/preview/mixkit-fashion-model-in-a-runway-show-41484-large.mp4"
+                        type="video/mp4"
                       />
                     </video>
                     {/* Editorial Radial Vignette Overlay */}
@@ -653,15 +651,15 @@ export default function App() {
 
                   {/* Video Control Widgets (Right Bottom) */}
                   <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/15 p-1.5 rounded-full">
-                    <button 
-                      onClick={toggleVideoPlay} 
+                    <button
+                      onClick={toggleVideoPlay}
                       className="p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition"
                       aria-label="Play/Pause Video"
                     >
                       {isVideoPlaying ? <Pause className="w-3.5 h-3.5" /> : <Play className="w-3.5 h-3.5" />}
                     </button>
-                    <button 
-                      onClick={toggleVideoSound} 
+                    <button
+                      onClick={toggleVideoSound}
                       className="p-2 rounded-full text-slate-300 hover:text-white hover:bg-white/10 transition"
                       aria-label="Mute/Unmute Video"
                     >
@@ -690,7 +688,7 @@ export default function App() {
                     </p>
 
                     <div className="flex flex-col sm:flex-row items-center gap-4 w-full sm:w-auto">
-                      <button 
+                      <button
                         onClick={() => {
                           setSelectedCategory('Featured');
                           const el = document.getElementById('catalog-grid-start');
@@ -700,7 +698,7 @@ export default function App() {
                       >
                         Explore Curated Drops
                       </button>
-                      <button 
+                      <button
                         onClick={() => handleNavCategory('Women')}
                         className="w-full sm:w-auto px-9 py-4 rounded-full bg-white/10 hover:bg-white/20 text-white border border-white/20 backdrop-blur-md font-bold text-xs uppercase tracking-[0.2em] transition-all"
                       >
@@ -758,13 +756,13 @@ export default function App() {
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                     {/* Women Card */}
-                    <div 
+                    <div
                       onClick={() => handleNavCategory('Women')}
                       className="group relative h-96 rounded-2xl overflow-hidden cursor-pointer border border-white/15"
                     >
-                      <img 
-                        src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80" 
-                        alt="Women Collection" 
+                      <img
+                        src="https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=900&q=80"
+                        alt="Women Collection"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-70 group-hover:opacity-90"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
@@ -776,13 +774,13 @@ export default function App() {
                     </div>
 
                     {/* Men Card */}
-                    <div 
+                    <div
                       onClick={() => handleNavCategory('Men')}
                       className="group relative h-96 rounded-2xl overflow-hidden cursor-pointer border border-white/15"
                     >
-                      <img 
-                        src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80" 
-                        alt="Men Collection" 
+                      <img
+                        src="https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=900&q=80"
+                        alt="Men Collection"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-70 group-hover:opacity-90"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
@@ -794,13 +792,13 @@ export default function App() {
                     </div>
 
                     {/* Kids Card */}
-                    <div 
+                    <div
                       onClick={() => handleNavCategory('Kids')}
                       className="group relative h-96 rounded-2xl overflow-hidden cursor-pointer border border-white/15"
                     >
-                      <img 
-                        src="https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=900&q=80" 
-                        alt="Kids Collection" 
+                      <img
+                        src="https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=900&q=80"
+                        alt="Kids Collection"
                         className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700 opacity-70 group-hover:opacity-90"
                       />
                       <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
@@ -828,8 +826,8 @@ export default function App() {
 
                       <div className="relative w-full md:w-80">
                         <Search className="w-4 h-4 absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-400" />
-                        <input 
-                          type="text" 
+                        <input
+                          type="text"
                           placeholder="Search items by cut, fabric..."
                           value={searchQuery}
                           onChange={e => setSearchQuery(e.target.value)}
@@ -843,11 +841,10 @@ export default function App() {
                       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full sm:w-auto -mx-1 px-1">
                         <button
                           onClick={() => setSelectedCategory('Featured')}
-                          className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${
-                            selectedCategory === 'Featured'
+                          className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${selectedCategory === 'Featured'
                               ? 'bg-white text-black shadow-lg shadow-white/15'
                               : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
-                          }`}
+                            }`}
                         >
                           Curated Drops
                         </button>
@@ -855,11 +852,10 @@ export default function App() {
                           <button
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${
-                              selectedCategory === cat
+                            className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${selectedCategory === cat
                                 ? 'bg-white text-black shadow-lg shadow-white/15'
                                 : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
-                            }`}
+                              }`}
                           >
                             {cat}
                           </button>
@@ -869,8 +865,8 @@ export default function App() {
                       <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400">
                         <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
                         <span>SORT:</span>
-                        <select 
-                          value={sortOption} 
+                        <select
+                          value={sortOption}
                           onChange={e => setSortOption(e.target.value)}
                           className="bg-transparent font-semibold border-b border-white/20 pb-0.5 outline-none cursor-pointer text-white"
                         >
@@ -885,20 +881,20 @@ export default function App() {
                   {/* 4 CARDS PER ROW WITH QUICK VIEW HOVER */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                     {filteredProducts.map(item => (
-                      <div 
-                        key={item.id} 
+                      <div
+                        key={item.id}
                         className="group flex flex-col"
                       >
                         <div className="w-full aspect-[3/4] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 mb-3.5 relative">
-                          <img 
-                            src={item.thumbnail_url} 
-                            alt={item.title} 
+                          <img
+                            src={item.thumbnail_url}
+                            alt={item.title}
                             onClick={() => handleSelectProduct(item.slug)}
-                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer" 
+                            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
                           />
-                          
+
                           {/* Quick View Button on Hover */}
-                          <button 
+                          <button
                             onClick={() => setQuickViewProduct(item)}
                             className="absolute bottom-3 left-3 right-3 py-2.5 rounded-lg bg-black/70 hover:bg-black text-white text-[11px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-1.5"
                           >
@@ -923,7 +919,7 @@ export default function App() {
             {/* Sub-view B: Product Detail Page (PDP) */}
             {storeMode === 'product' && product && (
               <main className="max-w-6xl mx-auto px-6 py-8">
-                <button 
+                <button
                   onClick={() => { setStoreMode('catalog'); setSelectedSize(null); }}
                   className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white rounded-full border border-white/15 text-xs font-bold uppercase tracking-wider transition-all mb-8 cursor-pointer"
                 >
@@ -940,9 +936,8 @@ export default function App() {
                         <button
                           key={img.id}
                           onClick={() => setActiveImage(img.image_url)}
-                          className={`w-20 aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all ${
-                            activeImage === img.image_url ? 'border-amber-400 ring-1 ring-amber-400' : 'border-transparent opacity-60 hover:opacity-100'
-                          }`}
+                          className={`w-20 aspect-[3/4] rounded-lg overflow-hidden border-2 transition-all ${activeImage === img.image_url ? 'border-amber-400 ring-1 ring-amber-400' : 'border-transparent opacity-60 hover:opacity-100'
+                            }`}
                         >
                           <img src={img.image_url} alt="Thumbnail" className="w-full h-full object-cover" />
                         </button>
@@ -974,9 +969,8 @@ export default function App() {
                             key={color.id}
                             onClick={() => handleColorChange(color.id)}
                             style={{ backgroundColor: color.hex }}
-                            className={`w-8 h-8 rounded-full border border-white/30 flex items-center justify-center transition-all ${
-                              selectedColor === color.id ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-black scale-105' : 'hover:scale-105'
-                            }`}
+                            className={`w-8 h-8 rounded-full border border-white/30 flex items-center justify-center transition-all ${selectedColor === color.id ? 'ring-2 ring-amber-400 ring-offset-2 ring-offset-black scale-105' : 'hover:scale-105'
+                              }`}
                           >
                             {selectedColor === color.id && (
                               <Check className={`w-4 h-4 ${color.hex === '#FAF9F6' ? 'text-black' : 'text-white'}`} />
@@ -1004,9 +998,8 @@ export default function App() {
                               key={size.id}
                               disabled={isOutOfStock}
                               onClick={() => setSelectedSize(size.id)}
-                              className={`py-3 text-sm font-semibold rounded-lg border transition-all ${
-                                isSelected ? 'border-white bg-white text-black font-bold' : 'border-white/20 bg-white/5 text-white hover:border-white'
-                              } ${isOutOfStock ? 'opacity-25 cursor-not-allowed line-through' : ''}`}
+                              className={`py-3 text-sm font-semibold rounded-lg border transition-all ${isSelected ? 'border-white bg-white text-black font-bold' : 'border-white/20 bg-white/5 text-white hover:border-white'
+                                } ${isOutOfStock ? 'opacity-25 cursor-not-allowed line-through' : ''}`}
                             >
                               {size.name}
                             </button>
@@ -1040,7 +1033,7 @@ export default function App() {
                     <div>
                       <h2 className="text-xl font-extrabold tracking-tight mb-2 text-white">Client Impression</h2>
                       <p className="text-xs text-slate-400 mb-6">Authenticated atelier reviews on fit and drapery.</p>
-                      
+
                       <div className="bg-white/5 p-6 rounded-2xl border border-white/10 backdrop-blur-md">
                         <div className="flex items-baseline gap-2 mb-2">
                           <span className="text-4xl font-extrabold tracking-tight text-white font-mono">{averageRating}</span>
@@ -1062,21 +1055,21 @@ export default function App() {
                         </h3>
                         <div>
                           <label className="block font-semibold mb-1 text-slate-300">Name</label>
-                          <input 
-                            type="text" 
-                            required 
+                          <input
+                            type="text"
+                            required
                             placeholder="e.g. Marc Jacobs"
                             value={newReview.reviewer_name}
-                            onChange={e => setNewReview({...newReview, reviewer_name: e.target.value})}
+                            onChange={e => setNewReview({ ...newReview, reviewer_name: e.target.value })}
                             className="w-full p-2.5 bg-black/40 border border-white/15 rounded-lg text-white outline-none focus:border-white"
                           />
                         </div>
                         <div className="grid grid-cols-2 gap-3">
                           <div>
                             <label className="block font-semibold mb-1 text-slate-300">Rating</label>
-                            <select 
+                            <select
                               value={newReview.rating}
-                              onChange={e => setNewReview({...newReview, rating: Number(e.target.value)})}
+                              onChange={e => setNewReview({ ...newReview, rating: Number(e.target.value) })}
                               className="w-full p-2.5 bg-neutral-900 border border-white/15 rounded-lg text-white outline-none focus:border-white"
                             >
                               <option value={5}>5 Stars (Superior)</option>
@@ -1086,9 +1079,9 @@ export default function App() {
                           </div>
                           <div>
                             <label className="block font-semibold mb-1 text-slate-300">Fit Feedback</label>
-                            <select 
+                            <select
                               value={newReview.fit_feedback}
-                              onChange={e => setNewReview({...newReview, fit_feedback: e.target.value})}
+                              onChange={e => setNewReview({ ...newReview, fit_feedback: e.target.value })}
                               className="w-full p-2.5 bg-neutral-900 border border-white/15 rounded-lg text-white outline-none focus:border-white"
                             >
                               <option value="True to Size">True to Size</option>
@@ -1099,17 +1092,17 @@ export default function App() {
                         </div>
                         <div>
                           <label className="block font-semibold mb-1 text-slate-300">Review</label>
-                          <textarea 
-                            rows={3} 
-                            required 
+                          <textarea
+                            rows={3}
+                            required
                             placeholder="Describe garment weight, hand-feel, and tailoring..."
                             value={newReview.review_text}
-                            onChange={e => setNewReview({...newReview, review_text: e.target.value})}
+                            onChange={e => setNewReview({ ...newReview, review_text: e.target.value })}
                             className="w-full p-2.5 bg-black/40 border border-white/15 rounded-lg text-white outline-none focus:border-white"
                           />
                         </div>
-                        <button 
-                          type="submit" 
+                        <button
+                          type="submit"
                           disabled={submittingReview}
                           className="w-full bg-white hover:bg-neutral-200 disabled:bg-neutral-800 text-black py-3 rounded-lg font-bold uppercase tracking-wider text-[11px]"
                         >
@@ -1165,25 +1158,22 @@ export default function App() {
               <div className="flex items-center gap-2 overflow-x-auto pb-1 sm:pb-0">
                 <button
                   onClick={() => setAdminTab('orders')}
-                  className={`px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${
-                    adminTab === 'orders' ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:text-white'
-                  }`}
+                  className={`px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${adminTab === 'orders' ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:text-white'
+                    }`}
                 >
                   Orders ({orders.length})
                 </button>
                 <button
                   onClick={() => setAdminTab('inventory')}
-                  className={`px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${
-                    adminTab === 'inventory' ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:text-white'
-                  }`}
+                  className={`px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${adminTab === 'inventory' ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:text-white'
+                    }`}
                 >
                   Stock Inventory
                 </button>
                 <button
                   onClick={() => setAdminTab('add-product')}
-                  className={`flex items-center gap-1 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${
-                    adminTab === 'add-product' ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:text-white'
-                  }`}
+                  className={`flex items-center gap-1 px-3 sm:px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-lg whitespace-nowrap transition-all ${adminTab === 'add-product' ? 'bg-white text-black' : 'bg-white/5 text-slate-400 hover:text-white'
+                    }`}
                 >
                   <PlusCircle className="w-3.5 h-3.5" /> Publish Item
                 </button>
@@ -1216,11 +1206,10 @@ export default function App() {
                         </td>
                         <td className="p-4 font-bold text-white font-mono">${order.total_amount}</td>
                         <td className="p-4">
-                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono ${
-                            order.order_status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                            order.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                            'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                          }`}>
+                          <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono ${order.order_status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                              order.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                                'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            }`}>
                             {order.order_status}
                           </span>
                         </td>
@@ -1250,8 +1239,8 @@ export default function App() {
                   <h2 className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider flex items-center gap-2 text-white">
                     <Layers className="w-4 h-4 text-amber-400" /> Real-Time Atelier SKU Stock
                   </h2>
-                  <select 
-                    value={selectedSlug} 
+                  <select
+                    value={selectedSlug}
                     onChange={(e) => handleSelectProduct(e.target.value)}
                     className="p-2 border border-white/20 rounded bg-neutral-900 text-white text-xs font-semibold w-full sm:max-w-xs"
                   >
@@ -1269,7 +1258,7 @@ export default function App() {
                         <p className="text-xs text-slate-500 font-mono">SKU: {variant.sku}</p>
                       </div>
                       <div className="flex items-center gap-2">
-                        <input 
+                        <input
                           type="number"
                           min="0"
                           defaultValue={variant.stock_quantity}
@@ -1292,15 +1281,15 @@ export default function App() {
                 <form onSubmit={handleCreateProduct} className="space-y-4 text-xs">
                   <div>
                     <label className="block font-mono font-bold uppercase mb-1 text-slate-300">Product Title</label>
-                    <input 
-                      type="text" 
-                      required 
+                    <input
+                      type="text"
+                      required
                       placeholder="e.g. Sculpted Wool Topcoat"
                       value={newProduct.title}
                       onChange={e => {
                         const title = e.target.value;
                         const slug = title.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)+/g, '');
-                        setNewProduct({...newProduct, title, slug});
+                        setNewProduct({ ...newProduct, title, slug });
                       }}
                       className="w-full p-3 bg-black/50 border border-white/20 rounded-lg text-white text-sm outline-none focus:border-white"
                     />
@@ -1309,9 +1298,9 @@ export default function App() {
                   <div className="grid grid-cols-2 gap-4">
                     <div>
                       <label className="block font-mono font-bold uppercase mb-1 text-slate-300">Target Category</label>
-                      <select 
+                      <select
                         value={newProduct.category_id}
-                        onChange={e => setNewProduct({...newProduct, category_id: Number(e.target.value)})}
+                        onChange={e => setNewProduct({ ...newProduct, category_id: Number(e.target.value) })}
                         className="w-full p-3 bg-neutral-900 border border-white/20 rounded-lg text-white text-sm outline-none focus:border-white"
                       >
                         <option value={1}>Men</option>
@@ -1321,13 +1310,13 @@ export default function App() {
                     </div>
                     <div>
                       <label className="block font-mono font-bold uppercase mb-1 text-slate-300">Base Price ($ USD)</label>
-                      <input 
-                        type="number" 
-                        step="0.01" 
-                        required 
+                      <input
+                        type="number"
+                        step="0.01"
+                        required
                         placeholder="185.00"
                         value={newProduct.base_price}
-                        onChange={e => setNewProduct({...newProduct, base_price: e.target.value})}
+                        onChange={e => setNewProduct({ ...newProduct, base_price: e.target.value })}
                         className="w-full p-3 bg-black/50 border border-white/20 rounded-lg text-white text-sm outline-none focus:border-white"
                       />
                     </div>
@@ -1335,30 +1324,30 @@ export default function App() {
 
                   <div>
                     <label className="block font-mono font-bold uppercase mb-1 text-slate-300">Image CDN URL (Unsplash)</label>
-                    <input 
-                      type="url" 
-                      required 
+                    <input
+                      type="url"
+                      required
                       placeholder="https://images.unsplash.com/..."
                       value={newProduct.image_url}
-                      onChange={e => setNewProduct({...newProduct, image_url: e.target.value})}
+                      onChange={e => setNewProduct({ ...newProduct, image_url: e.target.value })}
                       className="w-full p-3 bg-black/50 border border-white/20 rounded-lg text-white text-sm outline-none focus:border-white"
                     />
                   </div>
 
                   <div>
                     <label className="block font-mono font-bold uppercase mb-1 text-slate-300">Editorial Description</label>
-                    <textarea 
-                      rows={3} 
-                      required 
+                    <textarea
+                      rows={3}
+                      required
                       placeholder="Detail GSM, drape, fiber source, and atelier cut..."
                       value={newProduct.description}
-                      onChange={e => setNewProduct({...newProduct, description: e.target.value})}
+                      onChange={e => setNewProduct({ ...newProduct, description: e.target.value })}
                       className="w-full p-3 bg-black/50 border border-white/20 rounded-lg text-white text-sm outline-none focus:border-white"
                     />
                   </div>
 
-                  <button 
-                    type="submit" 
+                  <button
+                    type="submit"
                     disabled={isAddingProduct}
                     className="w-full bg-white hover:bg-neutral-200 disabled:bg-neutral-800 text-black py-4 rounded-xl font-bold uppercase tracking-widest text-xs mt-4"
                   >
@@ -1375,7 +1364,7 @@ export default function App() {
       {quickViewProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative shadow-2xl text-white">
-            <button 
+            <button
               onClick={() => setQuickViewProduct(null)}
               className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white transition"
             >
@@ -1393,7 +1382,7 @@ export default function App() {
                 <h3 className="text-2xl font-bold tracking-tight text-white">{quickViewProduct.title}</h3>
                 <p className="text-xl font-mono font-bold text-amber-300">${quickViewProduct.base_price}</p>
                 <p className="text-xs text-slate-300 leading-relaxed font-light">{quickViewProduct.description}</p>
-                
+
                 <div className="flex gap-2 pt-2">
                   <button
                     onClick={() => handleAddToCart(quickViewProduct, 'M')}
@@ -1426,14 +1415,14 @@ export default function App() {
             <p className="text-slate-400 max-w-sm leading-relaxed mb-6 font-light">
               An independent haute couture design atelier dedicated to uncompromising drapery, certified organic fibers, and permanent silhouette longevity.
             </p>
-            
+
             <form onSubmit={handleNewsletterSubmit} className="max-w-sm">
               <span className="text-[10px] font-mono uppercase tracking-widest text-slate-300 block mb-2 font-bold">Private Runway Newsletter</span>
               <div className="flex gap-2">
-                <input 
-                  type="email" 
+                <input
+                  type="email"
                   required
-                  placeholder="Enter VIP email" 
+                  placeholder="Enter VIP email"
                   value={newsletterEmail}
                   onChange={e => setNewsletterEmail(e.target.value)}
                   className="bg-white/5 border border-white/15 rounded-xl px-4 py-2.5 text-xs flex-1 outline-none focus:border-white text-white"
@@ -1483,7 +1472,7 @@ export default function App() {
       {isTrackingOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative text-white">
-            <button 
+            <button
               onClick={() => { setIsTrackingOpen(false); setTrackingResult(null); setTrackingError(''); }}
               className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
             >
@@ -1496,16 +1485,16 @@ export default function App() {
             <h2 className="text-2xl font-bold tracking-tight mb-4 text-white">Track Order Consignment</h2>
 
             <form onSubmit={handleTrackOrder} className="flex gap-2 mb-6">
-              <input 
-                type="text" 
+              <input
+                type="text"
                 required
                 placeholder="Enter Order ID (e.g. 101 or 102)"
                 value={trackOrderId}
                 onChange={e => setTrackOrderId(e.target.value)}
                 className="flex-1 p-3 bg-black/50 border border-white/20 rounded-xl text-xs outline-none focus:border-white font-mono"
               />
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={trackingLoading}
                 className="bg-white hover:bg-neutral-200 text-black px-5 py-3 rounded-xl text-xs font-bold uppercase tracking-wider"
               >
@@ -1526,11 +1515,10 @@ export default function App() {
                     <span className="text-slate-400 uppercase text-[10px]">Reference</span>
                     <p className="font-extrabold text-base text-amber-300">#{trackingResult.id}</p>
                   </div>
-                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${
-                    trackingResult.order_status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                    trackingResult.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                    'bg-amber-500/20 text-amber-400 border border-amber-500/30'
-                  }`}>
+                  <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${trackingResult.order_status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
+                      trackingResult.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                        'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    }`}>
                     {trackingResult.order_status}
                   </span>
                 </div>
@@ -1553,7 +1541,7 @@ export default function App() {
 
       {/* Cart Drawer */}
       {isCartOpen && (
-        <div 
+        <div
           onClick={() => setIsCartOpen(false)}
           className="fixed inset-0 bg-black/60 backdrop-blur-sm z-40 transition-opacity"
         />
@@ -1604,7 +1592,7 @@ export default function App() {
               <span className="text-sm text-slate-400 font-mono uppercase">Subtotal</span>
               <span className="text-lg font-bold font-mono text-white">${cartSubtotal.toFixed(2)}</span>
             </div>
-            <button 
+            <button
               onClick={() => {
                 setIsCartOpen(false);
                 setIsCheckoutOpen(true);
@@ -1621,7 +1609,7 @@ export default function App() {
       {isCheckoutOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative text-white">
-            <button 
+            <button
               onClick={() => setIsCheckoutOpen(false)}
               className="absolute top-5 right-5 p-2 rounded-full hover:bg-white/10 text-slate-400 hover:text-white"
             >
@@ -1638,16 +1626,16 @@ export default function App() {
               <form onSubmit={handleApplyCoupon} className="flex gap-2">
                 <div className="relative flex-1">
                   <Tag className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-slate-400" />
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     placeholder="Promo Code (e.g. VIP20)"
                     value={inputCoupon}
                     onChange={e => setInputCoupon(e.target.value.toUpperCase())}
                     className="w-full pl-9 pr-3 py-2 text-xs uppercase font-mono font-bold tracking-wider border border-white/15 rounded-lg outline-none focus:border-white bg-black/40 text-white"
                   />
                 </div>
-                <button 
-                  type="submit" 
+                <button
+                  type="submit"
                   disabled={couponLoading || !inputCoupon}
                   className="bg-white hover:bg-neutral-200 disabled:bg-neutral-800 text-black px-4 py-2 rounded-lg text-xs font-bold uppercase tracking-wider"
                 >
@@ -1670,12 +1658,12 @@ export default function App() {
             <form onSubmit={handlePlaceOrder} className="space-y-4 text-xs">
               <div>
                 <label className="block font-mono uppercase mb-1 text-slate-400">Full Name</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   placeholder="Jean Paul"
                   value={customer.name}
-                  onChange={e => setCustomer({...customer, name: e.target.value})}
+                  onChange={e => setCustomer({ ...customer, name: e.target.value })}
                   className="w-full p-3 bg-black/50 border border-white/20 rounded-xl text-white outline-none focus:border-white"
                 />
               </div>
@@ -1683,23 +1671,23 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-mono uppercase mb-1 text-slate-400">Email</label>
-                  <input 
-                    type="email" 
+                  <input
+                    type="email"
                     required
                     placeholder="jean@couture.com"
                     value={customer.email}
-                    onChange={e => setCustomer({...customer, email: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, email: e.target.value })}
                     className="w-full p-3 bg-black/50 border border-white/20 rounded-xl text-white outline-none focus:border-white"
                   />
                 </div>
                 <div>
                   <label className="block font-mono uppercase mb-1 text-slate-400">Cell Contact</label>
-                  <input 
-                    type="tel" 
+                  <input
+                    type="tel"
                     required
                     placeholder="+1 (555) 000-0000"
                     value={customer.phone}
-                    onChange={e => setCustomer({...customer, phone: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, phone: e.target.value })}
                     className="w-full p-3 bg-black/50 border border-white/20 rounded-xl text-white outline-none focus:border-white"
                   />
                 </div>
@@ -1707,12 +1695,12 @@ export default function App() {
 
               <div>
                 <label className="block font-mono uppercase mb-1 text-slate-400">Delivery Address</label>
-                <input 
-                  type="text" 
+                <input
+                  type="text"
                   required
                   placeholder="452 Broadway, SoHo"
                   value={customer.address}
-                  onChange={e => setCustomer({...customer, address: e.target.value})}
+                  onChange={e => setCustomer({ ...customer, address: e.target.value })}
                   className="w-full p-3 bg-black/50 border border-white/20 rounded-xl text-white outline-none focus:border-white"
                 />
               </div>
@@ -1720,23 +1708,23 @@ export default function App() {
               <div className="grid grid-cols-2 gap-3">
                 <div>
                   <label className="block font-mono uppercase mb-1 text-slate-400">City</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     required
                     placeholder="New York"
                     value={customer.city}
-                    onChange={e => setCustomer({...customer, city: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, city: e.target.value })}
                     className="w-full p-3 bg-black/50 border border-white/20 rounded-xl text-white outline-none focus:border-white"
                   />
                 </div>
                 <div>
                   <label className="block font-mono uppercase mb-1 text-slate-400">Zip Code</label>
-                  <input 
-                    type="text" 
+                  <input
+                    type="text"
                     required
                     placeholder="10013"
                     value={customer.postalCode}
-                    onChange={e => setCustomer({...customer, postalCode: e.target.value})}
+                    onChange={e => setCustomer({ ...customer, postalCode: e.target.value })}
                     className="w-full p-3 bg-black/50 border border-white/20 rounded-xl text-white outline-none focus:border-white"
                   />
                 </div>
@@ -1749,18 +1737,16 @@ export default function App() {
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('card')}
-                    className={`p-3 border rounded-xl flex items-center justify-center gap-2 font-bold transition-all ${
-                      paymentMethod === 'card' ? 'border-amber-400 bg-white text-black font-extrabold' : 'border-white/15 bg-white/5 text-slate-400 hover:text-white'
-                    }`}
+                    className={`p-3 border rounded-xl flex items-center justify-center gap-2 font-bold transition-all ${paymentMethod === 'card' ? 'border-amber-400 bg-white text-black font-extrabold' : 'border-white/15 bg-white/5 text-slate-400 hover:text-white'
+                      }`}
                   >
                     <CreditCard className="w-4 h-4" /> Stripe Card
                   </button>
                   <button
                     type="button"
                     onClick={() => setPaymentMethod('cod')}
-                    className={`p-3 border rounded-xl flex items-center justify-center gap-2 font-bold transition-all ${
-                      paymentMethod === 'cod' ? 'border-amber-400 bg-white text-black font-extrabold' : 'border-white/15 bg-white/5 text-slate-400 hover:text-white'
-                    }`}
+                    className={`p-3 border rounded-xl flex items-center justify-center gap-2 font-bold transition-all ${paymentMethod === 'cod' ? 'border-amber-400 bg-white text-black font-extrabold' : 'border-white/15 bg-white/5 text-slate-400 hover:text-white'
+                      }`}
                   >
                     <Banknote className="w-4 h-4" /> Courier Cash
                   </button>
@@ -1774,27 +1760,27 @@ export default function App() {
                       <span className="text-emerald-400 flex items-center gap-1"><Lock className="w-2.5 h-2.5" /> Encrypted</span>
                     </div>
                     <div>
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={cardDetails.cardNumber}
-                        onChange={e => setCardDetails({...cardDetails, cardNumber: e.target.value})}
+                        onChange={e => setCardDetails({ ...cardDetails, cardNumber: e.target.value })}
                         className="w-full p-2.5 bg-neutral-900 border border-white/20 rounded-lg text-xs font-mono font-semibold focus:border-white outline-none tracking-widest text-white"
                       />
                     </div>
                     <div className="grid grid-cols-2 gap-3">
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={cardDetails.cardExp}
-                        onChange={e => setCardDetails({...cardDetails, cardExp: e.target.value})}
+                        onChange={e => setCardDetails({ ...cardDetails, cardExp: e.target.value })}
                         className="p-2.5 bg-neutral-900 border border-white/20 rounded-lg text-xs font-mono font-semibold focus:border-white outline-none text-center text-white"
                       />
-                      <input 
-                        type="text" 
+                      <input
+                        type="text"
                         required
                         value={cardDetails.cardCvc}
-                        onChange={e => setCardDetails({...cardDetails, cardCvc: e.target.value})}
+                        onChange={e => setCardDetails({ ...cardDetails, cardCvc: e.target.value })}
                         className="p-2.5 bg-neutral-900 border border-white/20 rounded-lg text-xs font-mono font-semibold focus:border-white outline-none text-center text-white"
                       />
                     </div>
@@ -1820,15 +1806,15 @@ export default function App() {
                 </div>
               </div>
 
-              <button 
-                type="submit" 
+              <button
+                type="submit"
                 disabled={orderSubmitting}
                 className="w-full bg-white hover:bg-neutral-200 disabled:bg-neutral-800 text-black py-4 rounded-xl font-extrabold uppercase tracking-widest text-xs mt-2 transition-all shadow-xl shadow-white/10"
               >
-                {orderSubmitting 
-                  ? 'Authorizing Vault...' 
-                  : paymentMethod === 'card' 
-                    ? `Authorize Card ($${cartFinalTotal.toFixed(2)})` 
+                {orderSubmitting
+                  ? 'Authorizing Vault...'
+                  : paymentMethod === 'card'
+                    ? `Authorize Card ($${cartFinalTotal.toFixed(2)})`
                     : `Confirm Cash Order ($${cartFinalTotal.toFixed(2)})`}
               </button>
             </form>
@@ -1869,7 +1855,7 @@ export default function App() {
                 <span className="text-white">${orderSuccessData.total.toFixed(2)}</span>
               </div>
             </div>
-            <button 
+            <button
               onClick={() => { setOrderSuccessData(null); setStoreMode('catalog'); setSelectedCategory('Featured'); }}
               className="w-full bg-white hover:bg-neutral-200 text-black py-3.5 rounded-xl font-bold uppercase text-xs tracking-wider"
             >
