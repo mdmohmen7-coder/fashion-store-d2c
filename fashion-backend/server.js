@@ -8,6 +8,15 @@ const app = express();
 app.use(cors());
 app.use(express.json());
 
+// Test route to verify server is reachable
+app.get('/', (req, res) => {
+  res.send('Server is live and running!');
+});
+
+app.get('/api/test', (req, res) => {
+  res.json({ message: 'API is working fine!' });
+});
+
 // 0. Get All Products (Storefront Collection)
 app.get('/api/products', async (req, res) => {
   try {
@@ -338,6 +347,6 @@ process.on('unhandledRejection', (reason, promise) => {
 });
 
 const PORT = process.env.PORT || 5000;
-app.listen(PORT, () => {
-  console.log(`Server running on http://localhost:${PORT}`);
+app.listen(PORT, '0.0.0.0', () => {
+  console.log(`Server running on port ${PORT}`);
 });
