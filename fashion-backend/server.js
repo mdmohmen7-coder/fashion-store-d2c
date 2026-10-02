@@ -40,6 +40,65 @@ app.get('/api/db-test', async (req, res) => {
   }
 });
 
+// Database connection test route
+app.get('/api/db-test', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT 1 + 1 AS result');
+    res.json({ success: true, message: 'Database connected successfully!', result: rows[0].result });
+  } catch (error) {
+    console.error('DB Test Error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Database auto-initialize route
+app.get('/api/init-db', async (req, res) => {
+  try {
+    // 1. Create products table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS products (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        title VARCHAR(255) NOT NULL,
+        slug VARCHAR(255) NOT NULL UNIQUE,
+        price DECIMAL(10, 2) NOT NULL,
+        description TEXT,
+        image_url VARCHAR(500),
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 2. Create orders table
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS orders (
+        id INT AUTO_INCREMENT PRIMARY KEY,
+        customer_name VARCHAR(255) NOT NULL,
+        customer_phone VARCHAR(50) NOT NULL,
+        customer_address TEXT NOT NULL,
+        product_id INT,
+        quantity INT DEFAULT 1,
+        total_price DECIMAL(10, 2) NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+
+    // 3. Insert sample products if empty
+    const [existing] = await pool.query('SELECT COUNT(*) AS count FROM products');
+    if (existing[0].count === 0) {
+      await pool.query(`
+        INSERT INTO products (title, slug, price, description, image_url) VALUES
+        ('Premium Panjabi', 'premium-panjabi', 2500.00, 'Exclusive cotton collection', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500'),
+        ('Casual Shirt', 'casual-shirt', 1500.00, '100% pure linen casual shirt', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500')
+      `);
+    }
+
+    res.json({ success: true, message: 'Database tables and initial products created successfully!' });
+  } catch (error) {
+    console.error('Init DB Error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+
 // Live Products Route from Aiven MySQL
 app.get('/api/products', async (req, res) => {
   try {
