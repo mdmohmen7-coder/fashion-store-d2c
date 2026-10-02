@@ -182,7 +182,7 @@ export default function App() {
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
   useEffect(() => {
-    axios.get('https://fashion-backend-7149.onrender.com/api/products', { timeout: 60000 })
+    axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products', { timeout: 60000 })
       .then(res => {
         // Backend theke direct array ba res.data.data 2 tai handle korbe
         const products = Array.isArray(res.data) ? res.data : (res.data?.data || []);
