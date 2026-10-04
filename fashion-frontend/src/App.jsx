@@ -483,34 +483,77 @@ const handleTrackOrder = async (e) => {
     }));
   };
 
-  const handleCreateProduct = (e) => {
+ const handleCreateProduct = async (e) => {
     e.preventDefault();
     setIsAddingProduct(true);
-    setTimeout(() => {
-      const added = {
-        id: productsList.length + 1,
-        title: newProduct.title,
-        slug: newProduct.slug,
-        category: newProduct.category_id === 1 ? 'Men' : newProduct.category_id === 2 ? 'Women' : 'Kids',
-        category_name: newProduct.category_id === 1 ? 'Men' : newProduct.category_id === 2 ? 'Women' : 'Kids',
-        price: Number(newProduct.base_price),
-        base_price: Number(newProduct.base_price).toFixed(2),
-        description: newProduct.description,
-        image: newProduct.image_url,
-        thumbnail_url: newProduct.image_url,
-        is_featured: true,
-        images: [{ id: 1, image_url: newProduct.image_url, color_id: 1 }],
-        variants: [
-          { id: Date.now() + 1, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'S', stock_quantity: newProduct.stock_s, sku: 'NEW-S' },
-          { id: Date.now() + 2, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 2, size_name: 'M', stock_quantity: newProduct.stock_m, sku: 'NEW-M' },
-          { id: Date.now() + 3, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 3, size_name: 'L', stock_quantity: newProduct.stock_l, sku: 'NEW-L' }
-        ]
-      };
-      setProductsList([added, ...productsList]);
-      alert('Product published successfully!');
-      setAdminTab('inventory');
+
+    const categoryMap = { 1: 'men', 2: 'women', 3: 'kids' };
+    const payload = {
+      title: newProduct.title,
+      slug: newProduct.slug || newProduct.title.toLowerCase().replace(/[^a-z0-9]+/g, '-'),
+      price: Number(newProduct.base_price),
+      category: categoryMap[newProduct.category_id] || 'men',
+      description: newProduct.description,
+      image_url: newProduct.image_url
+    };
+
+    try {
+      const res = await axios.post('https://fashion-backend-api-s5sg.onrender.com/api/products', payload);
+      if (res.data.success) {
+        alert('Product published successfully to Database!');
+
+        const refreshed = await axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products');
+        if (refreshed.data.success && Array.isArray(refreshed.data.data)) {
+          const formatted = refreshed.data.data.map(p => {
+            const rawCat = (p.category || 'Men').toString().toLowerCase().trim();
+            let catName = 'Men';
+            if (rawCat.includes('women')) catName = 'Women';
+            else if (rawCat.includes('kids') || rawCat.includes('kid')) catName = 'Kids';
+
+            const img = p.image_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800';
+            const priceVal = Number(p.price) || 0;
+
+            return {
+              id: p.id,
+              title: p.title,
+              name: p.title,
+              slug: p.slug,
+              category: catName,
+              category_name: catName,
+              price: priceVal,
+              base_price: priceVal.toFixed(2),
+              description: p.description || '',
+              image: img,
+              thumbnail_url: img,
+              images: [{ id: 1, image_url: img, color_id: 1 }],
+              variants: [
+                { id: p.id * 10 + 1, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'M', stock_quantity: 10, sku: `SKU-${p.id}-M` }
+              ]
+            };
+          });
+          setProductsList(formatted);
+        }
+
+        setNewProduct({
+          category_id: 1,
+          title: '',
+          slug: '',
+          description: '',
+          base_price: '',
+          image_url: '',
+          stock_s: 10,
+          stock_m: 15,
+          stock_l: 10
+        });
+
+        setAdminTab('inventory');
+      }
+    } catch (err) {
+      console.error('Failed to publish product:', err);
+      alert('Error publishing product to database.');
+    } finally {
       setIsAddingProduct(false);
-    }, 400);
+    }
   };
 
   const handleSubmitReview = (e) => {

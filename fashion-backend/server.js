@@ -136,6 +136,40 @@ app.get('/api/products', async (req, res) => {
   }
 });
 
+
+// Create a new product (POST /api/products)
+app.post('/api/products', async (req, res) => {
+  try {
+    const { title, slug, price, category, description, image_url } = req.body;
+
+    if (!title || !slug || !price) {
+      return res.status(400).json({ success: false, message: 'Title, slug, and price are required' });
+    }
+
+    const [result] = await pool.query(
+      `INSERT INTO products (title, slug, price, category, description, image_url)
+       VALUES (?, ?, ?, ?, ?, ?)`,
+      [
+        title,
+        slug,
+        Number(price),
+        (category || 'men').toLowerCase(),
+        description || '',
+        image_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'
+      ]
+    );
+
+    res.status(201).json({
+      success: true,
+      productId: result.insertId,
+      message: 'Product published to database successfully!'
+    });
+  } catch (error) {
+    console.error('Create product error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
 // ==================== ORDERS API ==================== //
 
 // 1. Create New Order (POST /api/orders)
