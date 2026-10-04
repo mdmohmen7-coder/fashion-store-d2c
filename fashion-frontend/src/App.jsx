@@ -181,12 +181,14 @@ export default function App() {
   });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-useEffect(() => {
+const [isLoading, setIsLoading] = useState(false);
+
+  useEffect(() => {
+    setIsLoading(true);
     axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products', { timeout: 60000 })
       .then(res => {
         const rawProducts = Array.isArray(res.data) ? res.data : (res.data?.data || []);
         if (rawProducts.length > 0) {
-          // Frontend UI er shathe field ebong category case match kora
           const formattedProducts = rawProducts.map(p => {
             const rawCat = (p.category || 'Men').toLowerCase();
             const normalizedCategory = rawCat === 'women' ? 'Women' : rawCat === 'kids' ? 'Kids' : 'Men';
@@ -206,11 +208,17 @@ useEffect(() => {
           });
 
           setProductsList(formattedProducts);
-          setSelectedSlug(formattedProducts[0].slug || formattedProducts[0].id);
+          if (!selectedSlug) {
+            setSelectedSlug(formattedProducts[0].slug || formattedProducts[0].id);
+          }
         }
       })
       .catch(err => {
         console.error('Fetch error:', err);
+        // Error holeo jeno productsList empty na hoye ager initialCatalog thake
+      })
+      .finally(() => {
+        setIsLoading(false);
       });
   }, []);
   const handleSelectProduct = (slug) => {
