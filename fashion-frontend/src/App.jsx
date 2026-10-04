@@ -9,76 +9,52 @@ import {
 } from 'lucide-react';
 
 // 200 Atelier Garments Dataset (Categorized directly into Women, Men, Kids)
-const initialCatalog = (() => {
-  const menImages = [
-    'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1556905055-8f358a7a47b2?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1624378439575-d8705ad7ae80?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1617137984095-74e4e5e3613f?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1507679799987-c73779587ccf?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1490114538077-0a7f8cb49891?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1516257984-b1b4d707412e?auto=format&fit=crop&w=800&q=80'
-  ];
+const [isLoading, setIsLoading] = useState(false);
 
-  const womenImages = [
-    'https://images.unsplash.com/photo-1515886657613-9f3515b0c78f?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1595777457583-95e059d581b8?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1509631179647-0177331693ae?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1515372039744-b8f02a3ae446?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1490481651871-ab68de25d43d?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1503342217505-b0a15ec3261c?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1529139574466-a303027c1d8b?auto=format&fit=crop&w=800&q=80'
-  ];
+  useEffect(() => {
+    setIsLoading(true);
+    axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products', { timeout: 60000 })
+      .then(res => {
+        const rawProducts = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        if (rawProducts.length > 0) {
+          const formattedProducts = rawProducts.map(p => {
+            const rawCat = (p.category || 'men').toString().toLowerCase().trim();
+            
+            // Shob dhoroner casing support korar jonno
+            let catName = 'Men';
+            if (rawCat.includes('women')) catName = 'Women';
+            else if (rawCat.includes('kids') || rawCat.includes('kid')) catName = 'Kids';
+            
+            const img = p.image_url || (Array.isArray(p.images) ? p.images[0] : p.image) || '';
+            
+            return {
+              ...p,
+              id: p.id,
+              name: p.title || p.name,
+              title: p.title || p.name,
+              category: catName, // 'Men', 'Women', 'Kids'
+              categoryUpper: catName.toUpperCase(), // 'MEN', 'WOMEN', 'KIDS'
+              categoryLower: catName.toLowerCase(), // 'men', 'women', 'kids'
+              price: Number(p.price) || 0,
+              image: img,
+              images: [img],
+              description: p.description || ''
+            };
+          });
 
-  const kidsImages = [
-    'https://images.unsplash.com/photo-1519238263530-99bdd11df2ea?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1514090458221-65bb69cf63e6?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1503919545889-aef636e10ad4?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1519457431-44ccd64a579b?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1543332164-6e82f355badc?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1596870230751-ebdfce98ec42?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?auto=format&fit=crop&w=800&q=80',
-    'https://images.unsplash.com/photo-1522075469751-3a6694fb2f61?auto=format&fit=crop&w=800&q=80'
-  ];
-
-  const titles = {
-    Men: ['Tailored Wool Blazer', 'Heavyweight Oversized Tee', 'Pleated Straight Trouser', 'Cashmere Knit Crewneck', 'Structured Minimal Trench', 'French Terry Hoodie', 'Linen Relaxed Shirt', 'Japanese Selvedge Denim'],
-    Women: ['Sculpted Hourglass Blazer', 'Silk Drape Slip Dress', 'Merino Ribbed Knit Sweater', 'High-Rise Tailored Pant', 'Belted Cashmere Overcoat', 'Structured Poplin Blouse', 'Pleated Midi Skirt', 'Brushed Wool Cardigan'],
-    Kids: ['Organic Cotton Hoodie', 'Everyday Minimal Jogger', 'Relaxed French Terry Sweatshirt', 'Structured Mini Bomber Jacket', 'Soft Knit Ribbed Beanie', 'Organic Fleece Crewneck', 'Chino Utility Pants', 'Warm Puffer Vest']
-  };
-
-  const cats = ['Women', 'Men', 'Kids'];
-  const res = [];
-  for (let i = 1; i <= 200; i++) {
-    const cat = cats[i % 3];
-    const pool = cat === 'Men' ? menImages : cat === 'Women' ? womenImages : kidsImages;
-    const thumb = pool[i % pool.length];
-    res.push({
-      id: i,
-      title: `${titles[cat][i % titles[cat].length]} Ed. ${Math.floor(i / 3) + 1}`,
-      slug: `product-${i}-${cat.toLowerCase()}`,
-      category_name: cat,
-      base_price: (45 + (i * 7) % 180).toFixed(2),
-      description: `Precision-crafted luxury ${cat.toLowerCase()}'s garment. Formed with 450 GSM pure materiality, architectural drapery, and French seams.`,
-      thumbnail_url: thumb,
-      is_featured: i % 4 === 0,
-      images: [
-        { id: 1, image_url: thumb, color_id: 1 },
-        { id: 2, image_url: pool[(i + 1) % pool.length], color_id: 2 }
-      ],
-      variants: [
-        { id: i * 10 + 1, color_id: 1, color_name: 'Noir Charcoal', hex_code: '#1A1A1A', size_id: 1, size_name: 'S', stock_quantity: 12, sku: `SKU-${i}-S` },
-        { id: i * 10 + 2, color_id: 1, color_name: 'Noir Charcoal', hex_code: '#1A1A1A', size_id: 2, size_name: 'M', stock_quantity: 18, sku: `SKU-${i}-M` },
-        { id: i * 10 + 3, color_id: 1, color_name: 'Noir Charcoal', hex_code: '#1A1A1A', size_id: 3, size_name: 'L', stock_quantity: 8, sku: `SKU-${i}-L` },
-        { id: i * 10 + 4, color_id: 2, color_name: 'Ecru Chalk', hex_code: '#FAF9F6', size_id: 1, size_name: 'S', stock_quantity: 10, sku: `SKU-${i}-W-S` },
-        { id: i * 10 + 5, color_id: 2, color_name: 'Ecru Chalk', hex_code: '#FAF9F6', size_id: 2, size_name: 'M', stock_quantity: 15, sku: `SKU-${i}-W-M` }
-      ]
-    });
-  }
-  return res;
-})();
+          setProductsList(formattedProducts);
+          if (!selectedSlug && formattedProducts.length > 0) {
+            setSelectedSlug(formattedProducts[0].slug || formattedProducts[0].id);
+          }
+        }
+      })
+      .catch(err => {
+        console.error('Fetch error:', err);
+      })
+      .finally(() => {
+        setIsLoading(false);
+      });
+  }, []);
 
 export default function App() {
   const [view, setView] = useState('store');
@@ -247,13 +223,25 @@ const [isLoading, setIsLoading] = useState(false);
   };
 
   // Filter products: On 'Featured' show top attractive items, otherwise show Women / Men / Kids
-  const filteredProducts = productsList
+const filteredProducts = productsList
     .filter(p => {
-      const matchesCategory = selectedCategory === 'Featured'
-        ? p.is_featured
-        : p.category_name?.toLowerCase() === selectedCategory.toLowerCase();
-      const matchesSearch = p.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-        p.description?.toLowerCase().includes(searchQuery.toLowerCase());
+      // Category check (Featured, All ba specific category handle korbe)
+      const currentCat = (p.category || p.category_name || '').toLowerCase();
+      const targetCat = (selectedCategory || '').toLowerCase();
+
+      const matchesCategory = 
+        !selectedCategory || 
+        targetCat === 'all' || 
+        targetCat === 'featured' || 
+        currentCat === targetCat;
+
+      // Search check
+      const query = (searchQuery || '').toLowerCase();
+      const title = (p.title || p.name || '').toLowerCase();
+      const desc = (p.description || '').toLowerCase();
+
+      const matchesSearch = !query || title.includes(query) || desc.includes(query);
+
       return matchesCategory && matchesSearch;
     })
     .sort((a, b) => {
