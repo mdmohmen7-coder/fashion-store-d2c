@@ -361,39 +361,59 @@ export default function App() {
     }
   };
 
-  const handlePlaceOrder = async (e) => {
+const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setOrderSubmitting(true);
 
-    const simulatedOrderId = Math.floor(1000 + Math.random() * 9000);
-    setTimeout(() => {
-      setOrderSuccessData({
-        orderId: simulatedOrderId,
-        total: cartFinalTotal,
-        itemsCount: totalItemsCount,
-        discount: discountAmount,
-        method: paymentMethod === 'card' ? 'Stripe Encrypted Card (4242)' : 'Cash on Delivery'
-      });
+    const payload = {
+      customer_name: customer.name,
+      customer_email: customer.email,
+      customer_phone: customer.phone,
+      customer_address: customer.address,
+      city: customer.city,
+      postal_code: customer.postalCode,
+      total_price: cartFinalTotal.toFixed(2),
+      payment_method: paymentMethod,
+      items: cart
+    };
 
-      setOrders(prev => [{
-        id: simulatedOrderId,
-        customer_name: customer.name,
-        customer_email: customer.email,
-        shipping_address: customer.address,
-        city: customer.city,
-        postal_code: customer.postalCode,
-        total_amount: cartFinalTotal.toFixed(2),
-        order_status: 'processing'
-      }, ...prev]);
+    try {
+      const res = await axios.post('https://fashion-backend-api-s5sg.onrender.com/api/orders', payload);
+      if (res.data.success) {
+        const orderId = res.data.orderId;
+        setOrderSuccessData({
+          orderId: orderId,
+          total: cartFinalTotal,
+          itemsCount: totalItemsCount,
+          discount: discountAmount,
+          method: paymentMethod === 'card' ? 'Stripe Encrypted Card (4242)' : 'Cash on Delivery'
+        });
 
-      setCart([]);
-      setAppliedCoupon(null);
-      setIsCheckoutOpen(false);
+        // Admin list update
+        setOrders(prev => [{
+          id: orderId,
+          customer_name: customer.name,
+          customer_email: customer.email,
+          shipping_address: customer.address,
+          city: customer.city,
+          postal_code: customer.postalCode,
+          total_amount: cartFinalTotal.toFixed(2),
+          order_status: 'processing'
+        }, ...prev]);
+
+        setCart([]);
+        setAppliedCoupon(null);
+        setIsCheckoutOpen(false);
+      }
+    } catch (err) {
+      console.error('Order creation error:', err);
+      alert('Failed to place order. Please try again.');
+    } finally {
       setOrderSubmitting(false);
-    }, 600);
+    }
   };
 
-  const handleTrackOrder = (e) => {
+const handleTrackOrder = async (e) => {
     e.preventDefault();
     if (!trackOrderId.trim()) return;
     setTrackingLoading(true);
@@ -401,27 +421,20 @@ export default function App() {
     setTrackingResult(null);
 
     const cleanId = trackOrderId.replace(/[^0-9]/g, '');
-    const foundOrder = orders.find(o => String(o.id) === cleanId);
 
-    setTimeout(() => {
-      if (foundOrder) {
-        setTrackingResult({
-          id: foundOrder.id,
-          order_status: foundOrder.order_status,
-          customer_name: foundOrder.customer_name,
-          shipping_address: foundOrder.shipping_address,
-          city: foundOrder.city,
-          postal_code: foundOrder.postal_code,
-          total_amount: foundOrder.total_amount,
-          items: [
-            { id: 1, product_name: 'Studio Essentials Tailored Edition', color_name: 'Noir', size_name: 'M', quantity: 1, unit_price: foundOrder.total_amount }
-          ]
-        });
+    try {
+      const res = await axios.get(`https://fashion-backend-api-s5sg.onrender.com/api/orders/${cleanId}`);
+      if (res.data.success && res.data.order) {
+        setTrackingResult(res.data.order);
       } else {
-        setTrackingError('Order not found. Try searching with Order #101 or #102.');
+        setTrackingError(`Order #${cleanId} not found in database.`);
       }
+    } catch (err) {
+      console.error('Tracking fetch error:', err);
+      setTrackingError(`Order #${cleanId} not found or connection failed.`);
+    } finally {
       setTrackingLoading(false);
-    }, 400);
+    }
   };
 
   const handleUpdateOrderStatus = (orderId, newStatus) => {
