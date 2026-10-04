@@ -181,21 +181,38 @@ export default function App() {
   });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-  useEffect(() => {
+useEffect(() => {
     axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products', { timeout: 60000 })
       .then(res => {
-        // Backend theke direct array ba res.data.data 2 tai handle korbe
-        const products = Array.isArray(res.data) ? res.data : (res.data?.data || []);
-        if (products.length > 0) {
-          setProductsList(products);
-          setSelectedSlug(products[0].slug);
+        const rawProducts = Array.isArray(res.data) ? res.data : (res.data?.data || []);
+        if (rawProducts.length > 0) {
+          // Frontend UI er shathe field ebong category case match kora
+          const formattedProducts = rawProducts.map(p => {
+            const rawCat = (p.category || 'Men').toLowerCase();
+            const normalizedCategory = rawCat === 'women' ? 'Women' : rawCat === 'kids' ? 'Kids' : 'Men';
+            const img = p.image_url || (Array.isArray(p.images) ? p.images[0] : p.image) || '';
+            
+            return {
+              ...p,
+              id: p.id,
+              name: p.title || p.name,
+              title: p.title || p.name,
+              category: normalizedCategory,
+              price: Number(p.price) || 0,
+              image: img,
+              images: [img],
+              description: p.description || ''
+            };
+          });
+
+          setProductsList(formattedProducts);
+          setSelectedSlug(formattedProducts[0].slug || formattedProducts[0].id);
         }
       })
       .catch(err => {
         console.error('Fetch error:', err);
       });
   }, []);
-
   const handleSelectProduct = (slug) => {
     setSelectedSlug(slug);
     const found = productsList.find(p => p.slug === slug);
