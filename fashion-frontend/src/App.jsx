@@ -8,77 +8,92 @@ import {
   Volume2, VolumeX, Play, Pause, Eye, Award, Feather, Compass
 } from 'lucide-react';
 
-// 200 Atelier Garments Dataset (Categorized directly into Women, Men, Kids)
-const [isLoading, setIsLoading] = useState(false);
-
-  useEffect(() => {
-    setIsLoading(true);
-    axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products', { timeout: 60000 })
-      .then(res => {
-        const rawProducts = Array.isArray(res.data) ? res.data : (res.data?.data || []);
-        if (rawProducts.length > 0) {
-          const formattedProducts = rawProducts.map(p => {
-            const rawCat = (p.category || 'men').toString().toLowerCase().trim();
-            
-            // Shob dhoroner casing support korar jonno
-            let catName = 'Men';
-            if (rawCat.includes('women')) catName = 'Women';
-            else if (rawCat.includes('kids') || rawCat.includes('kid')) catName = 'Kids';
-            
-            const img = p.image_url || (Array.isArray(p.images) ? p.images[0] : p.image) || '';
-            
-            return {
-              ...p,
-              id: p.id,
-              name: p.title || p.name,
-              title: p.title || p.name,
-              category: catName, // 'Men', 'Women', 'Kids'
-              categoryUpper: catName.toUpperCase(), // 'MEN', 'WOMEN', 'KIDS'
-              categoryLower: catName.toLowerCase(), // 'men', 'women', 'kids'
-              price: Number(p.price) || 0,
-              image: img,
-              images: [img],
-              description: p.description || ''
-            };
-          });
-
-          setProductsList(formattedProducts);
-          if (!selectedSlug && formattedProducts.length > 0) {
-            setSelectedSlug(formattedProducts[0].slug || formattedProducts[0].id);
-          }
-        }
-      })
-      .catch(err => {
-        console.error('Fetch error:', err);
-      })
-      .finally(() => {
-        setIsLoading(false);
-      });
-  }, []);
+const initialCatalog = [
+  {
+    id: 1,
+    title: 'Premium Cotton Panjabi',
+    slug: 'premium-cotton-panjabi',
+    category: 'Men',
+    category_name: 'Men',
+    price: 2500,
+    base_price: '2500.00',
+    description: 'Exclusive cotton collection tailored to perfection.',
+    image: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800',
+    thumbnail_url: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800',
+    images: [{ id: 1, image_url: 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=800', color_id: 1 }],
+    variants: [
+      { id: 101, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'M', stock_quantity: 10, sku: 'PANJ-M' },
+      { id: 102, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 2, size_name: 'L', stock_quantity: 8, sku: 'PANJ-L' }
+    ]
+  },
+  {
+    id: 2,
+    title: 'Classic Linen Shirt',
+    slug: 'classic-linen-shirt',
+    category: 'Men',
+    category_name: 'Men',
+    price: 1800,
+    base_price: '1800.00',
+    description: 'Pure linen casual shirt designed for comfort.',
+    image: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800',
+    thumbnail_url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800',
+    images: [{ id: 2, image_url: 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=800', color_id: 1 }],
+    variants: [
+      { id: 201, color_id: 1, color_name: 'White', hex_code: '#FAF9F6', size_id: 1, size_name: 'M', stock_quantity: 12, sku: 'SHIRT-M' }
+    ]
+  },
+  {
+    id: 3,
+    title: 'Haute Couture Silk Dress',
+    slug: 'haute-couture-silk-dress',
+    category: 'Women',
+    category_name: 'Women',
+    price: 3500,
+    base_price: '3500.00',
+    description: 'Sculpted hourglass tailoring and pure silk drapery.',
+    image: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800',
+    thumbnail_url: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800',
+    images: [{ id: 3, image_url: 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800', color_id: 1 }],
+    variants: [
+      { id: 301, color_id: 1, color_name: 'Silk Rose', hex_code: '#B76E79', size_id: 1, size_name: 'S', stock_quantity: 6, sku: 'DRESS-S' }
+    ]
+  },
+  {
+    id: 4,
+    title: 'Kids Loopback Fleece',
+    slug: 'kids-loopback-fleece',
+    category: 'Kids',
+    category_name: 'Kids',
+    price: 1200,
+    base_price: '1200.00',
+    description: 'Ultra-soft organic daily staple fleece.',
+    image: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=800',
+    thumbnail_url: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=800',
+    images: [{ id: 4, image_url: 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=800', color_id: 1 }],
+    variants: [
+      { id: 401, color_id: 1, color_name: 'Heather Gray', hex_code: '#808080', size_id: 1, size_name: 'M', stock_quantity: 15, sku: 'FLEECE-M' }
+    ]
+  }
+];
 
 export default function App() {
   const [view, setView] = useState('store');
   const [storeMode, setStoreMode] = useState('catalog');
   const [selectedCategory, setSelectedCategory] = useState('Featured');
 
-  // Filter & Search States
   const [searchQuery, setSearchQuery] = useState('');
   const [sortOption, setSortOption] = useState('default');
 
-  // Video Player Controls
   const videoRef = useRef(null);
   const [isVideoMuted, setIsVideoMuted] = useState(true);
   const [isVideoPlaying, setIsVideoPlaying] = useState(true);
 
-  // Catalog & Product states
   const [productsList, setProductsList] = useState(initialCatalog);
   const [selectedSlug, setSelectedSlug] = useState(initialCatalog[0].slug);
   const [product, setProduct] = useState(initialCatalog[0]);
 
-  // Quick View Modal
   const [quickViewProduct, setQuickViewProduct] = useState(null);
 
-  // Reviews States
   const [reviews, setReviews] = useState([
     { id: 1, reviewer_name: 'Camille Laurent', rating: 5, fit_feedback: 'True to Size', review_text: 'The architectural drape is unmatched. Equivalent to Parisian atelier pieces twice this value.', created_at: new Date().toISOString() },
     { id: 2, reviewer_name: 'Julian Vance', rating: 5, fit_feedback: 'True to Size', review_text: 'Heavyweight organic fabric with flawless tailored finishes. Absolute wardrobe essential.', created_at: new Date().toISOString() }
@@ -91,7 +106,6 @@ export default function App() {
   });
   const [submittingReview, setSubmittingReview] = useState(false);
 
-  // Variant & Cart states
   const [selectedColor, setSelectedColor] = useState(1);
   const [selectedSize, setSelectedSize] = useState(null);
   const [activeImage, setActiveImage] = useState(initialCatalog[0].thumbnail_url);
@@ -101,7 +115,6 @@ export default function App() {
   const [orderSubmitting, setOrderSubmitting] = useState(false);
   const [orderSuccessData, setOrderSuccessData] = useState(null);
 
-  // Payment Selection States (Stripe / Cash)
   const [paymentMethod, setPaymentMethod] = useState('card');
   const [cardDetails, setCardDetails] = useState({
     cardNumber: '4242 •••• •••• 4242',
@@ -109,24 +122,20 @@ export default function App() {
     cardCvc: '123'
   });
 
-  // Promo Code States
   const [inputCoupon, setInputCoupon] = useState('');
   const [appliedCoupon, setAppliedCoupon] = useState(null);
   const [couponError, setCouponError] = useState('');
   const [couponLoading, setCouponLoading] = useState(false);
 
-  // Live Order Tracking States
   const [isTrackingOpen, setIsTrackingOpen] = useState(false);
   const [trackOrderId, setTrackOrderId] = useState('');
   const [trackingResult, setTrackingResult] = useState(null);
   const [trackingError, setTrackingError] = useState('');
   const [trackingLoading, setTrackingLoading] = useState(false);
 
-  // Newsletter State
   const [newsletterEmail, setNewsletterEmail] = useState('');
   const [newsletterSubscribed, setNewsletterSubscribed] = useState(false);
 
-  // Customer Form
   const [customer, setCustomer] = useState({
     name: '',
     email: '',
@@ -136,14 +145,12 @@ export default function App() {
     postalCode: ''
   });
 
-  // Admin Dashboard States
   const [orders, setOrders] = useState([
     { id: 101, customer_name: 'Alexander Wright', customer_email: 'alex@example.com', shipping_address: '450 Lexington Ave', city: 'New York', postal_code: '10017', total_amount: '185.00', order_status: 'delivered' },
     { id: 102, customer_name: 'Elena Rostova', customer_email: 'elena@example.com', shipping_address: '12 Queen St', city: 'London', postal_code: 'W1J 5PA', total_amount: '240.00', order_status: 'shipped' }
   ]);
   const [adminTab, setAdminTab] = useState('orders');
 
-  // Admin New Product Form State
   const [newProduct, setNewProduct] = useState({
     category_id: 1,
     title: '',
@@ -157,46 +164,50 @@ export default function App() {
   });
   const [isAddingProduct, setIsAddingProduct] = useState(false);
 
-const [isLoading, setIsLoading] = useState(false);
-
   useEffect(() => {
-    setIsLoading(true);
     axios.get('https://fashion-backend-api-s5sg.onrender.com/api/products', { timeout: 60000 })
       .then(res => {
         const rawProducts = Array.isArray(res.data) ? res.data : (res.data?.data || []);
         if (rawProducts.length > 0) {
-          const formattedProducts = rawProducts.map(p => {
-            const rawCat = (p.category || 'Men').toLowerCase();
-            const normalizedCategory = rawCat === 'women' ? 'Women' : rawCat === 'kids' ? 'Kids' : 'Men';
-            const img = p.image_url || (Array.isArray(p.images) ? p.images[0] : p.image) || '';
-            
+          const formatted = rawProducts.map(p => {
+            const rawCat = (p.category || 'Men').toString().toLowerCase().trim();
+            let catName = 'Men';
+            if (rawCat.includes('women')) catName = 'Women';
+            else if (rawCat.includes('kids') || rawCat.includes('kid')) catName = 'Kids';
+
+            const img = p.image_url || p.thumbnail_url || (Array.isArray(p.images) ? p.images[0] : p.image) || '';
+            const priceVal = Number(p.price || p.base_price) || 0;
+
             return {
-              ...p,
               id: p.id,
-              name: p.title || p.name,
-              title: p.title || p.name,
-              category: normalizedCategory,
-              price: Number(p.price) || 0,
+              title: p.title || p.name || 'Untitled Piece',
+              name: p.title || p.name || 'Untitled Piece',
+              slug: p.slug || `item-${p.id}`,
+              category: catName,
+              category_name: catName,
+              price: priceVal,
+              base_price: priceVal.toFixed(2),
+              description: p.description || 'Exclusive Atelier collection garment.',
               image: img,
-              images: [img],
-              description: p.description || ''
+              thumbnail_url: img,
+              images: [{ id: 1, image_url: img, color_id: 1 }],
+              variants: p.variants && p.variants.length > 0 ? p.variants : [
+                { id: p.id * 10 + 1, color_id: 1, color_name: 'Noir', hex_code: '#1A1A1A', size_id: 1, size_name: 'M', stock_quantity: 10, sku: `SKU-${p.id}-M` }
+              ]
             };
           });
 
-          setProductsList(formattedProducts);
-          if (!selectedSlug) {
-            setSelectedSlug(formattedProducts[0].slug || formattedProducts[0].id);
-          }
+          setProductsList(formatted);
+          setProduct(formatted[0]);
+          setSelectedSlug(formatted[0].slug);
+          setActiveImage(formatted[0].thumbnail_url);
         }
       })
       .catch(err => {
         console.error('Fetch error:', err);
-        // Error holeo jeno productsList empty na hoye ager initialCatalog thake
-      })
-      .finally(() => {
-        setIsLoading(false);
       });
   }, []);
+
   const handleSelectProduct = (slug) => {
     setSelectedSlug(slug);
     const found = productsList.find(p => p.slug === slug);
@@ -207,7 +218,7 @@ const [isLoading, setIsLoading] = useState(false);
       } else {
         setSelectedColor(1);
       }
-      setActiveImage(found.thumbnail_url || found.images?.[0]?.image_url || '');
+      setActiveImage(found.thumbnail_url || found.image || '');
       setSelectedSize(null);
       setStoreMode('product');
       window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -222,27 +233,23 @@ const [isLoading, setIsLoading] = useState(false);
     el?.scrollIntoView({ behavior: 'smooth' });
   };
 
-  // Filter products: On 'Featured' show top attractive items, otherwise show Women / Men / Kids
-const filteredProducts = productsList
+  const filteredProducts = (productsList || [])
     .filter(p => {
-      // Category check (Featured, All ba specific category handle korbe)
-      const currentCat = (p.category || p.category_name || '').toLowerCase();
-      const targetCat = (selectedCategory || '').toLowerCase();
+      if (!p) return false;
+      const currentCat = (p.category || p.category_name || '').toString().toLowerCase();
+      const targetCat = (selectedCategory || '').toString().toLowerCase();
 
-      const matchesCategory = 
-        !selectedCategory || 
-        targetCat === 'all' || 
-        targetCat === 'featured' || 
+      const matchesCategory =
+        !selectedCategory ||
+        targetCat === 'all' ||
+        targetCat === 'featured' ||
         currentCat === targetCat;
 
-      // Search check
-      const query = (searchQuery || '').toLowerCase();
-      const title = (p.title || p.name || '').toLowerCase();
-      const desc = (p.description || '').toLowerCase();
+      const query = (searchQuery || '').toString().toLowerCase();
+      const title = (p.title || p.name || '').toString().toLowerCase();
+      const desc = (p.description || '').toString().toLowerCase();
 
-      const matchesSearch = !query || title.includes(query) || desc.includes(query);
-
-      return matchesCategory && matchesSearch;
+      return matchesCategory && (!query || title.includes(query) || desc.includes(query));
     })
     .sort((a, b) => {
       if (sortOption === 'price-asc') return Number(a.base_price) - Number(b.base_price);
@@ -250,19 +257,19 @@ const filteredProducts = productsList
       return 0;
     });
 
-  const availableColors = product ? Array.from(
+  const availableColors = product?.variants ? Array.from(
     new Map(product.variants.map(v => [v.color_id, { id: v.color_id, name: v.color_name, hex: v.hex_code }])).values()
-  ) : [];
+  ) : [{ id: 1, name: 'Noir', hex: '#1A1A1A' }];
 
-  const availableSizes = product ? Array.from(
+  const availableSizes = product?.variants ? Array.from(
     new Map(product.variants.map(v => [v.size_id, { id: v.size_id, name: v.size_name }])).values()
-  ) : [];
+  ) : [{ id: 1, name: 'M' }];
 
   const displayedImages = product?.images?.filter(img => img.color_id === selectedColor) || [];
 
-  const currentVariant = product ? product.variants.find(
+  const currentVariant = product?.variants?.find(
     v => v.color_id === selectedColor && v.size_id === selectedSize
-  ) : null;
+  ) || null;
 
   const handleColorChange = (colorId) => {
     setSelectedColor(colorId);
@@ -292,7 +299,7 @@ const filteredProducts = productsList
           price: Number(targetProduct.base_price),
           color: 'Noir Charcoal',
           size: sizeToUse,
-          image: targetProduct.thumbnail_url,
+          image: targetProduct.thumbnail_url || targetProduct.image,
           quantity: 1
         }
       ]);
@@ -436,9 +443,12 @@ const filteredProducts = productsList
         id: productsList.length + 1,
         title: newProduct.title,
         slug: newProduct.slug,
+        category: newProduct.category_id === 1 ? 'Men' : newProduct.category_id === 2 ? 'Women' : 'Kids',
         category_name: newProduct.category_id === 1 ? 'Men' : newProduct.category_id === 2 ? 'Women' : 'Kids',
+        price: Number(newProduct.base_price),
         base_price: Number(newProduct.base_price).toFixed(2),
         description: newProduct.description,
+        image: newProduct.image_url,
         thumbnail_url: newProduct.image_url,
         is_featured: true,
         images: [{ id: 1, image_url: newProduct.image_url, color_id: 1 }],
@@ -491,16 +501,13 @@ const filteredProducts = productsList
   return (
     <div className="min-h-screen bg-[#070b12] text-slate-100 antialiased font-sans relative overflow-x-hidden flex flex-col justify-between selection:bg-amber-400 selection:text-black">
       <div>
-        {/* Top Luxury Announcement Bar */}
         <div className="bg-neutral-950 text-slate-400 text-[10px] sm:text-[11px] py-2 px-4 text-center font-mono tracking-[0.25em] uppercase border-b border-white/5 flex items-center justify-center gap-2">
           <span className="w-1.5 h-1.5 rounded-full bg-amber-400 animate-pulse"></span>
           <span>PARIS RUNWAY ARCHIVE • COMPLIMENTARY COURIER OVER $150 • PROMO: <strong className="text-white">VIP20</strong></span>
         </div>
 
-        {/* LUXURY GLASSMORPHIC NAV HEADER WITH WOMEN, MEN, KIDS DIRECT LINKS */}
         <header className="sticky top-0 z-40 bg-[#070b12]/85 backdrop-blur-xl border-b border-white/10 py-3.5 px-4 sm:px-10 flex justify-between items-center transition-all">
           <div className="flex items-center gap-4 sm:gap-10">
-            {/* Logo */}
             <button
               onClick={() => { setView('store'); setStoreMode('catalog'); setSelectedCategory('Featured'); }}
               className="group flex items-center gap-2.5 text-left"
@@ -518,7 +525,6 @@ const filteredProducts = productsList
               </div>
             </button>
 
-            {/* Direct Collections Navbar: WOMEN, MEN, KIDS */}
             <nav className="hidden md:flex items-center space-x-1 lg:space-x-2">
               <button
                 onClick={() => { setView('store'); setStoreMode('catalog'); setSelectedCategory('Featured'); }}
@@ -560,7 +566,6 @@ const filteredProducts = productsList
           </div>
 
           <div className="flex items-center gap-2 sm:gap-3">
-            {/* View Switcher: Storefront vs Admin */}
             <div className="flex items-center gap-1 bg-white/5 p-1 rounded-xl border border-white/10">
               <button
                 onClick={() => { setView('store'); setSelectedCategory('Featured'); }}
@@ -604,7 +609,6 @@ const filteredProducts = productsList
           </div>
         </header>
 
-        {/* Mobile Secondary Category Navigation Bar */}
         {view === 'store' && (
           <div className="flex md:hidden items-center justify-around bg-black/60 border-b border-white/10 py-2.5 px-4 backdrop-blur-md">
             <button
@@ -634,14 +638,11 @@ const filteredProducts = productsList
           </div>
         )}
 
-        {/* VIEW 1: STOREFRONT */}
         {view === 'store' && (
           <div>
             {storeMode === 'catalog' && (
               <div>
-                {/* CINEMATIC VIDEO HERO BILLBOARD WITH GLASSMORPHISM OVERLAY */}
                 <section className="relative min-h-[82vh] flex items-center justify-center overflow-hidden border-b border-white/10">
-                  {/* Background Looping Fashion Video */}
                   <div className="absolute inset-0 z-0">
                     <video
                       ref={videoRef}
@@ -657,12 +658,10 @@ const filteredProducts = productsList
                         type="video/mp4"
                       />
                     </video>
-                    {/* Editorial Radial Vignette Overlay */}
                     <div className="absolute inset-0 bg-gradient-to-t from-[#070b12] via-[#070b12]/40 to-[#070b12]/70" />
                     <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_center,_var(--tw-gradient-stops))] from-transparent via-[#070b12]/50 to-[#070b12]" />
                   </div>
 
-                  {/* Video Control Widgets (Right Bottom) */}
                   <div className="absolute bottom-6 right-6 z-20 flex items-center gap-2 bg-black/60 backdrop-blur-md border border-white/15 p-1.5 rounded-full">
                     <button
                       onClick={toggleVideoPlay}
@@ -680,7 +679,6 @@ const filteredProducts = productsList
                     </button>
                   </div>
 
-                  {/* Main Hero Centerstage */}
                   <div className="relative z-10 max-w-5xl mx-auto px-6 py-20 text-center flex flex-col items-center">
                     <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/10 border border-white/15 backdrop-blur-md mb-6 animate-pulse">
                       <Sparkles className="w-3.5 h-3.5 text-amber-300" />
@@ -719,7 +717,6 @@ const filteredProducts = productsList
                       </button>
                     </div>
 
-                    {/* Floating Luxury Badges */}
                     <div className="mt-14 pt-8 border-t border-white/10 grid grid-cols-2 sm:grid-cols-4 gap-6 text-xs text-slate-400 font-mono">
                       <div className="flex items-center justify-center gap-2">
                         <Award className="w-4 h-4 text-amber-400" />
@@ -741,7 +738,6 @@ const filteredProducts = productsList
                   </div>
                 </section>
 
-                {/* LUXURY CONTINUOUS MARQUEE TICKER TAPE */}
                 <div className="bg-[#05080e] border-y border-white/10 py-3.5 overflow-hidden">
                   <div className="flex whitespace-nowrap animate-marquee gap-8 text-xs font-mono tracking-[0.25em] uppercase text-slate-400 font-bold">
                     <span>• MILAN FASHION WEEK ARCHIVE</span>
@@ -750,13 +746,9 @@ const filteredProducts = productsList
                     <span>• WORLDWIDE EXPRESS COURIER</span>
                     <span>• 100% TRACEABLE ORGANIC FIBERS</span>
                     <span>• VIP ATELIER MEMBERSHIP ACCESS</span>
-                    <span>• MILAN FASHION WEEK ARCHIVE</span>
-                    <span>• LIMITED 200 RUNWAY EDITIONS</span>
-                    <span>• BESPOKE HAND-STITCHED TAILORING</span>
                   </div>
                 </div>
 
-                {/* CURATED CATEGORY SPOTLIGHT CARDS (WOMEN, MEN, KIDS) */}
                 <section className="max-w-[1440px] mx-auto px-6 sm:px-10 py-16">
                   <div className="text-center max-w-2xl mx-auto mb-12">
                     <span className="text-[10px] font-mono uppercase tracking-[0.3em] text-amber-400 font-bold">
@@ -768,7 +760,6 @@ const filteredProducts = productsList
                   </div>
 
                   <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {/* Women Card */}
                     <div
                       onClick={() => handleNavCategory('Women')}
                       className="group relative h-96 rounded-2xl overflow-hidden cursor-pointer border border-white/15"
@@ -786,7 +777,6 @@ const filteredProducts = productsList
                       </div>
                     </div>
 
-                    {/* Men Card */}
                     <div
                       onClick={() => handleNavCategory('Men')}
                       className="group relative h-96 rounded-2xl overflow-hidden cursor-pointer border border-white/15"
@@ -804,7 +794,6 @@ const filteredProducts = productsList
                       </div>
                     </div>
 
-                    {/* Kids Card */}
                     <div
                       onClick={() => handleNavCategory('Kids')}
                       className="group relative h-96 rounded-2xl overflow-hidden cursor-pointer border border-white/15"
@@ -824,7 +813,6 @@ const filteredProducts = productsList
                   </div>
                 </section>
 
-                {/* 4-COLUMN ATTRACTIVE FASHION SHOWCASE GRID */}
                 <main id="catalog-grid-start" className="max-w-[1440px] mx-auto px-6 sm:px-10 py-12">
                   <div className="flex flex-col gap-6 border-b border-white/10 pb-8 mb-10">
                     <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
@@ -850,7 +838,6 @@ const filteredProducts = productsList
                     </div>
 
                     <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      {/* Department switcher inside catalog - 100% Mobile Responsive Scrollable */}
                       <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full sm:w-auto -mx-1 px-1">
                         <button
                           onClick={() => setSelectedCategory('Featured')}
@@ -891,7 +878,6 @@ const filteredProducts = productsList
                     </div>
                   </div>
 
-                  {/* 4 CARDS PER ROW WITH QUICK VIEW HOVER */}
                   <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-6 sm:gap-8">
                     {filteredProducts.map(item => (
                       <div
@@ -900,13 +886,11 @@ const filteredProducts = productsList
                       >
                         <div className="w-full aspect-[3/4] bg-neutral-900 rounded-xl overflow-hidden border border-white/10 mb-3.5 relative">
                           <img
-                            src={item.thumbnail_url}
+                            src={item.thumbnail_url || item.image}
                             alt={item.title}
                             onClick={() => handleSelectProduct(item.slug)}
                             className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500 cursor-pointer"
                           />
-
-                          {/* Quick View Button on Hover */}
                           <button
                             onClick={() => setQuickViewProduct(item)}
                             className="absolute bottom-3 left-3 right-3 py-2.5 rounded-lg bg-black/70 hover:bg-black text-white text-[11px] font-bold uppercase tracking-wider backdrop-blur-md border border-white/20 opacity-0 group-hover:opacity-100 transition-all flex items-center justify-center gap-1.5"
@@ -917,7 +901,7 @@ const filteredProducts = productsList
 
                         <div className="flex justify-between items-start cursor-pointer" onClick={() => handleSelectProduct(item.slug)}>
                           <div>
-                            <p className="text-[10px] uppercase font-mono tracking-widest text-slate-400 font-bold">{item.category_name}</p>
+                            <p className="text-[10px] uppercase font-mono tracking-widest text-slate-400 font-bold">{item.category_name || item.category}</p>
                             <h3 className="text-sm font-bold tracking-tight text-white group-hover:text-amber-300 transition truncate max-w-[200px]">{item.title}</h3>
                           </div>
                           <p className="text-sm font-bold text-slate-200">${item.base_price}</p>
@@ -929,7 +913,6 @@ const filteredProducts = productsList
               </div>
             )}
 
-            {/* Sub-view B: Product Detail Page (PDP) */}
             {storeMode === 'product' && product && (
               <main className="max-w-6xl mx-auto px-6 py-8">
                 <button
@@ -1000,7 +983,7 @@ const filteredProducts = productsList
                       </div>
                       <div className="grid grid-cols-5 gap-2">
                         {availableSizes.map((size) => {
-                          const variant = product.variants.find(
+                          const variant = product?.variants?.find(
                             v => v.color_id === selectedColor && v.size_id === size.id
                           );
                           const isOutOfStock = !variant || variant.stock_quantity === 0;
@@ -1040,7 +1023,6 @@ const filteredProducts = productsList
                   </div>
                 </div>
 
-                {/* EDITORIAL REVIEWS */}
                 <section className="border-t border-white/10 pt-16">
                   <div className="grid grid-cols-1 lg:grid-cols-3 gap-12">
                     <div>
@@ -1160,7 +1142,6 @@ const filteredProducts = productsList
           </div>
         )}
 
-        {/* VIEW 2: ADMIN MANAGEMENT PORTAL */}
         {view === 'admin' && (
           <main className="max-w-6xl mx-auto px-4 sm:px-6 py-8">
             <div className="flex flex-col sm:flex-row sm:justify-between sm:items-center gap-4 mb-6 border-b border-white/10 pb-4">
@@ -1264,7 +1245,7 @@ const filteredProducts = productsList
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {product.variants.map(variant => (
+                  {(product.variants || []).map(variant => (
                     <div key={variant.id} className="border border-white/10 bg-black/40 p-4 rounded-xl flex justify-between items-center">
                       <div>
                         <p className="font-bold text-sm text-white">{variant.color_name} / Size {variant.size_name}</p>
@@ -1373,7 +1354,6 @@ const filteredProducts = productsList
         )}
       </div>
 
-      {/* QUICK VIEW LIGHTBOX MODAL */}
       {quickViewProduct && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl max-w-2xl w-full p-6 sm:p-8 relative shadow-2xl text-white">
@@ -1386,11 +1366,11 @@ const filteredProducts = productsList
 
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-6 items-center">
               <div className="aspect-[3/4] rounded-2xl overflow-hidden bg-neutral-900 border border-white/10">
-                <img src={quickViewProduct.thumbnail_url} alt={quickViewProduct.title} className="w-full h-full object-cover" />
+                <img src={quickViewProduct.thumbnail_url || quickViewProduct.image} alt={quickViewProduct.title} className="w-full h-full object-cover" />
               </div>
               <div className="space-y-4">
                 <span className="text-[10px] font-mono uppercase tracking-[0.25em] text-amber-400 font-bold">
-                  {quickViewProduct.category_name} Edition
+                  {quickViewProduct.category_name || quickViewProduct.category} Edition
                 </span>
                 <h3 className="text-2xl font-bold tracking-tight text-white">{quickViewProduct.title}</h3>
                 <p className="text-xl font-mono font-bold text-amber-300">${quickViewProduct.base_price}</p>
@@ -1420,7 +1400,6 @@ const filteredProducts = productsList
         </div>
       )}
 
-      {/* EDITORIAL FOOTER */}
       <footer className="bg-black text-slate-400 border-t border-white/10 mt-20 pt-16 pb-12 px-6 sm:px-12">
         <div className="max-w-7xl mx-auto grid grid-cols-1 md:grid-cols-4 gap-10 pb-12 border-b border-white/10 text-xs">
           <div className="md:col-span-2">
@@ -1481,7 +1460,6 @@ const filteredProducts = productsList
         </div>
       </footer>
 
-      {/* TRACKING MODAL */}
       {isTrackingOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative text-white">
@@ -1552,7 +1530,6 @@ const filteredProducts = productsList
         </div>
       )}
 
-      {/* Cart Drawer */}
       {isCartOpen && (
         <div
           onClick={() => setIsCartOpen(false)}
@@ -1618,7 +1595,6 @@ const filteredProducts = productsList
         )}
       </aside>
 
-      {/* STRIPE CARD CHECKOUT MODAL */}
       {isCheckoutOpen && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl shadow-2xl max-w-lg w-full max-h-[90vh] overflow-y-auto p-8 relative text-white">
@@ -1634,7 +1610,6 @@ const filteredProducts = productsList
             </div>
             <h2 className="text-2xl font-bold tracking-tight mb-5 text-white">Dispatch & Settlement</h2>
 
-            {/* Promo Code Box */}
             <div className="bg-white/5 border border-white/15 rounded-xl p-3.5 mb-5">
               <form onSubmit={handleApplyCoupon} className="flex gap-2">
                 <div className="relative flex-1">
@@ -1743,7 +1718,6 @@ const filteredProducts = productsList
                 </div>
               </div>
 
-              {/* PAYMENT METHOD SELECTION */}
               <div className="pt-3 border-t border-white/10">
                 <label className="block font-mono uppercase mb-2 text-slate-400">Settlement Gateway</label>
                 <div className="grid grid-cols-2 gap-3 mb-3">
@@ -1765,7 +1739,6 @@ const filteredProducts = productsList
                   </button>
                 </div>
 
-                {/* STRIPE CARD FIELDS CONTAINER */}
                 {paymentMethod === 'card' && (
                   <div className="bg-black/40 border border-white/15 rounded-xl p-3.5 space-y-3 font-mono">
                     <div className="flex justify-between items-center text-[10px] text-slate-400 font-bold uppercase">
@@ -1801,7 +1774,6 @@ const filteredProducts = productsList
                 )}
               </div>
 
-              {/* Order Calculation Matrix */}
               <div className="pt-3 border-t border-white/10 space-y-1 font-mono text-xs">
                 <div className="flex justify-between text-slate-400">
                   <span>Subtotal</span>
@@ -1835,7 +1807,6 @@ const filteredProducts = productsList
         </div>
       )}
 
-      {/* Confirmation Modal */}
       {orderSuccessData && (
         <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4">
           <div className="bg-[#0b101b] border border-white/20 rounded-3xl shadow-2xl max-w-md w-full p-8 text-center text-white">
