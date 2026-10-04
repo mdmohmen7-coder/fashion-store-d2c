@@ -208,6 +208,31 @@ export default function App() {
       });
   }, []);
 
+  // Admin View-te gele Database theke real orders load hobe
+  useEffect(() => {
+    if (view === 'admin') {
+      axios.get('https://fashion-backend-api-s5sg.onrender.com/api/orders')
+        .then(res => {
+          if (res.data.success && Array.isArray(res.data.data)) {
+            const mappedOrders = res.data.data.map(o => ({
+              id: o.id,
+              customer_name: o.customer_name,
+              customer_email: o.customer_email || 'N/A',
+              shipping_address: o.customer_address,
+              city: o.city || '',
+              postal_code: o.postal_code || '',
+              total_amount: Number(o.total_price).toFixed(2),
+              order_status: o.order_status
+            }));
+            setOrders(mappedOrders);
+          }
+        })
+        .catch(err => {
+          console.error('Failed to fetch admin orders:', err);
+        });
+    }
+  }, [view]);
+
   const handleSelectProduct = (slug) => {
     setSelectedSlug(slug);
     const found = productsList.find(p => p.slug === slug);
@@ -437,10 +462,20 @@ const handleTrackOrder = async (e) => {
     }
   };
 
-  const handleUpdateOrderStatus = (orderId, newStatus) => {
+ const handleUpdateOrderStatus = async (orderId, newStatus) => {
+    // 1. UI-te shathe shathe status change kora
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, order_status: newStatus } : o));
-  };
 
+    // 2. MySQL Database-e live update pathano
+    try {
+      await axios.put(`https://fashion-backend-api-s5sg.onrender.com/api/orders/${orderId}/status`, {
+        status: newStatus
+      });
+    } catch (err) {
+      console.error('Order status update failed:', err);
+      alert('Could not update status in database.');
+    }
+  };
   const handleUpdateStock = (variantId, newStock) => {
     setProduct(prev => ({
       ...prev,
