@@ -54,50 +54,43 @@ app.get('/api/db-test', async (req, res) => {
 // Database auto-initialize route
 app.get('/api/init-db', async (req, res) => {
   try {
-    // 1. Create products table
+    // 1. Create products table with category
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         slug VARCHAR(255) NOT NULL UNIQUE,
         price DECIMAL(10, 2) NOT NULL,
+        category VARCHAR(100) DEFAULT 'men',
         description TEXT,
         image_url VARCHAR(500),
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    // 2. Create orders table
-    await pool.query(`
-      CREATE TABLE IF NOT EXISTS orders (
-        id INT AUTO_INCREMENT PRIMARY KEY,
-        customer_name VARCHAR(255) NOT NULL,
-        customer_phone VARCHAR(50) NOT NULL,
-        customer_address TEXT NOT NULL,
-        product_id INT,
-        quantity INT DEFAULT 1,
-        total_price DECIMAL(10, 2) NOT NULL,
-        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
-      )
-    `);
-
-    // 3. Insert sample products if empty
-    const [existing] = await pool.query('SELECT COUNT(*) AS count FROM products');
-    if (existing[0].count === 0) {
-      await pool.query(`
-        INSERT INTO products (title, slug, price, description, image_url) VALUES
-        ('Premium Panjabi', 'premium-panjabi', 2500.00, 'Exclusive cotton collection', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500'),
-        ('Casual Shirt', 'casual-shirt', 1500.00, '100% pure linen casual shirt', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500')
-      `);
+    // Add category column if it was created earlier without it
+    try {
+      await pool.query(`ALTER TABLE products ADD COLUMN category VARCHAR(100) DEFAULT 'men'`);
+    } catch (e) {
+      // Column might already exist, ignore error
     }
 
-    res.json({ success: true, message: 'Database tables and initial products created successfully!' });
+    // 2. Clear old test products and add complete ones
+    await pool.query('DELETE FROM products');
+    await pool.query(`
+      INSERT INTO products (title, slug, price, category, description, image_url) VALUES
+      ('Premium Cotton Panjabi', 'premium-cotton-panjabi', 2500.00, 'men', 'Exclusive cotton collection tailored to perfection.', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500'),
+      ('Classic Linen Shirt', 'classic-linen-shirt', 1800.00, 'men', 'Pure linen casual shirt designed for comfort.', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500'),
+      ('Haute Couture Silk Dress', 'haute-couture-silk-dress', 3500.00, 'women', 'Sculpted hourglass tailoring and pure silk drapery.', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500'),
+      ('Kids Loopback Fleece', 'kids-loopback-fleece', 1200.00, 'kids', 'Ultra-soft organic daily staple fleece.', 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=500')
+    `);
+
+    res.json({ success: true, message: 'Products with categories inserted successfully!' });
   } catch (error) {
     console.error('Init DB Error:', error.message);
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
 
 // Live Products Route from Aiven MySQL
 app.get('/api/products', async (req, res) => {
