@@ -233,6 +233,17 @@ export default function App() {
     }
   }, [view]);
 
+  // Live Reviews Fetch Hook
+  useEffect(() => {
+    axios.get('https://fashion-backend-api-s5sg.onrender.com/api/reviews')
+      .then(res => {
+        if (res.data.success && Array.isArray(res.data.data) && res.data.data.length > 0) {
+          setReviews(res.data.data);
+        }
+      })
+      .catch(err => console.error('Error fetching reviews:', err));
+  }, []);
+
   const handleSelectProduct = (slug) => {
     setSelectedSlug(slug);
     const found = productsList.find(p => p.slug === slug);
@@ -556,25 +567,28 @@ const handleTrackOrder = async (e) => {
     }
   };
 
-  const handleSubmitReview = (e) => {
+  const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!newReview.reviewer_name || !newReview.review_text) return;
     setSubmittingReview(true);
-    setTimeout(() => {
-      setReviews([
-        {
-          id: Date.now(),
-          reviewer_name: newReview.reviewer_name,
-          rating: newReview.rating,
-          fit_feedback: newReview.fit_feedback,
-          review_text: newReview.review_text,
-          created_at: new Date().toISOString()
-        },
-        ...reviews
-      ]);
-      setNewReview({ reviewer_name: '', rating: 5, fit_feedback: 'True to Size', review_text: '' });
+
+    try {
+      const res = await axios.post('https://fashion-backend-api-s5sg.onrender.com/api/reviews', newReview);
+      if (res.data.success) {
+        // Refetch reviews from DB to show immediately
+        const refreshed = await axios.get('https://fashion-backend-api-s5sg.onrender.com/api/reviews');
+        if (refreshed.data.success && Array.isArray(refreshed.data.data)) {
+          setReviews(refreshed.data.data);
+        }
+        setNewReview({ reviewer_name: '', rating: 5, fit_feedback: 'True to Size', review_text: '' });
+        alert('Review published successfully to Database!');
+      }
+    } catch (err) {
+      console.error('Submit review error:', err);
+      alert('Failed to submit review.');
+    } finally {
       setSubmittingReview(false);
-    }, 300);
+    }
   };
 
   const handleNewsletterSubmit = (e) => {
