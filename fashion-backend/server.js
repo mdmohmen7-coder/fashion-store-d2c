@@ -36,10 +36,10 @@ app.get('/api/db-test', async (req, res) => {
   }
 });
 
-// Database Auto-Initialize Route (Products, Orders & Reviews Setup)
+// Database auto-initialize route
 app.get('/api/init-db', async (req, res) => {
   try {
-    // 1. Create products table with category
+    // 1. Ensure Products Table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -53,25 +53,7 @@ app.get('/api/init-db', async (req, res) => {
       )
     `);
 
-    try {
-      await pool.query(`ALTER TABLE products ADD COLUMN category VARCHAR(100) DEFAULT 'men'`);
-    } catch (e) {
-      // Column might already exist
-    }
-
-    // 2. Insert starter products ONLY if table is empty (won't overwrite newly created products)
-    const [existingProducts] = await pool.query('SELECT COUNT(*) as count FROM products');
-    if (existingProducts[0].count === 0) {
-      await pool.query(`
-        INSERT INTO products (title, slug, price, category, description, image_url) VALUES
-        ('Premium Cotton Panjabi', 'premium-cotton-panjabi', 2500.00, 'men', 'Exclusive cotton collection tailored to perfection.', 'https://images.unsplash.com/photo-1583743814966-8936f5b7be1a?w=500'),
-        ('Classic Linen Shirt', 'classic-linen-shirt', 1800.00, 'men', 'Pure linen casual shirt designed for comfort.', 'https://images.unsplash.com/photo-1596755094514-f87e34085b2c?w=500'),
-        ('Haute Couture Silk Dress', 'haute-couture-silk-dress', 3500.00, 'women', 'Sculpted hourglass tailoring and pure silk drapery.', 'https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=500'),
-        ('Kids Loopback Fleece', 'kids-loopback-fleece', 1200.00, 'kids', 'Ultra-soft organic daily staple fleece.', 'https://images.unsplash.com/photo-1622290291468-a28f7a7dc6a8?w=500')
-      `);
-    }
-
-    // 3. Create orders table for Checkout & Tracking
+    // 2. Ensure Orders Table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -89,50 +71,31 @@ app.get('/api/init-db', async (req, res) => {
       )
     `);
 
-    const alterQueries = [
-      `ALTER TABLE orders ADD COLUMN customer_email VARCHAR(255)`,
-      `ALTER TABLE orders ADD COLUMN city VARCHAR(100)`,
-      `ALTER TABLE orders ADD COLUMN postal_code VARCHAR(50)`,
-      `ALTER TABLE orders ADD COLUMN payment_method VARCHAR(50) DEFAULT 'cod'`,
-      `ALTER TABLE orders ADD COLUMN items_json LONGTEXT`,
-      `ALTER TABLE orders ADD COLUMN order_status VARCHAR(50) DEFAULT 'processing'`
-    ];
-
-    for (const q of alterQueries) {
-      try { await pool.query(q); } catch (e) { /* column exists */ }
-    }
-
-    // 4. Create reviews table
+    // 3. Ensure Reviews Table
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reviews (
         id INT AUTO_INCREMENT PRIMARY KEY,
         reviewer_name VARCHAR(255) NOT NULL,
-        rating INT NOT NULL,
-        fit_feedback VARCHAR(100),
+        rating INT NOT NULL DEFAULT 5,
+        fit_feedback VARCHAR(100) DEFAULT 'True to Size',
         review_text TEXT NOT NULL,
         created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
       )
     `);
 
-    res.json({ success: true, message: 'Database initialized: Products, Orders, and Reviews tables ready!' });
+    res.json({
+      success: true,
+      message: 'Database initialized: Products, Orders, and Reviews tables ready!'
+    });
   } catch (error) {
-    console.error('Init DB Error:', error.message);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Init DB Detailed Error:', error);
+    res.status(500).json({
+      success: false,
+      error: error.message || String(error)
+    });
   }
 });
 
-// ==================== PRODUCTS API ==================== //
-
-// 1. Get all products (GET /api/products)
-app.get('/api/products', async (req, res) => {
-  try {
-    const [rows] = await pool.query('SELECT * FROM products ORDER BY id DESC');
-    res.json({ success: true, data: rows });
-  } catch (error) {
-    console.error('Fetch products error:', error.message);
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
 
 // 2. Create a new product (POST /api/products)
 app.post('/api/products', async (req, res) => {
