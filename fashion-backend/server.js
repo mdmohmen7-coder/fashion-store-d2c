@@ -25,14 +25,19 @@ const pool = mysql.createPool({
   queueLimit: 0
 });
 
-// Health check / DB Test Route
+/// Health check / DB Test Route with deep error inspector
 app.get('/api/db-test', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT 1 + 1 AS solution');
     res.json({ success: true, message: 'Database connected successfully!', solution: rows[0].solution });
   } catch (error) {
-    console.error('Database connection error:', error.message);
-    res.status(500).json({ success: false, error: error.message });
+    console.error('Database connection error:', error);
+    res.status(500).json({
+      success: false,
+      message: error.message,
+      code: error.code,
+      allErrors: error.errors ? error.errors.map(e => e.message) : []
+    });
   }
 });
 
