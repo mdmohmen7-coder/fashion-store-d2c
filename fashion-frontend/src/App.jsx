@@ -793,9 +793,9 @@ const handleTrackOrder = async (e) => {
                     </div>
 
                     <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-white leading-[1.08] mb-6">
-                      Sculpted Silhouette. <br />
+                      Portfolio Website. <br />
                       <span className="font-serif italic font-light text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-slate-300">
-                        Pure Materiality.
+                       MD Mohmen
                       </span>
                     </h1>
 
