@@ -978,38 +978,47 @@ export default function App() {
                       </div>
                     </div>
 
-                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-                      <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-none w-full sm:w-auto -mx-1 px-1">
+                    {/* FULLY MOBILE RESPONSIVE FILTER & SORT BAR */}
+                    <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 w-full">
+                      {/* Horizontally smooth-scrolling category pills */}
+                      <div className="flex items-center gap-2 overflow-x-auto no-scrollbar py-1 w-full sm:w-auto">
                         <button
+                          type="button"
                           onClick={() => setSelectedCategory('Featured')}
-                          className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${selectedCategory === 'Featured'
-                            ? 'bg-white text-black shadow-lg shadow-white/15'
-                            : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
-                            }`}
+                          className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-full whitespace-nowrap shrink-0 transition-all ${
+                            selectedCategory === 'Featured'
+                              ? 'bg-white text-black shadow-md shadow-white/10'
+                              : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
+                          }`}
                         >
                           Curated Drops
                         </button>
                         {['Women', 'Men', 'Kids'].map((cat) => (
                           <button
                             key={cat}
+                            type="button"
                             onClick={() => setSelectedCategory(cat)}
-                            className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${selectedCategory === cat
-                              ? 'bg-white text-black shadow-lg shadow-white/15'
-                              : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
-                              }`}
+                            className={`px-4 py-2 text-xs font-bold uppercase tracking-wider rounded-full whitespace-nowrap shrink-0 transition-all ${
+                              selectedCategory === cat
+                                ? 'bg-white text-black shadow-md shadow-white/10'
+                                : 'bg-white/5 text-slate-300 hover:bg-white/10 border border-white/10'
+                            }`}
                           >
                             {cat}
                           </button>
                         ))}
                       </div>
 
-                      <div className="flex items-center gap-2 text-xs font-mono font-bold text-slate-400">
-                        <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
-                        <span>SORT:</span>
+                      {/* Sort Controls */}
+                      <div className="flex items-center justify-between sm:justify-end gap-2 text-xs font-mono font-bold text-slate-400 pt-1 sm:pt-0">
+                        <div className="flex items-center gap-2">
+                          <SlidersHorizontal className="w-3.5 h-3.5 text-amber-400" />
+                          <span>SORT:</span>
+                        </div>
                         <select
                           value={sortOption}
                           onChange={e => setSortOption(e.target.value)}
-                          className="bg-transparent font-semibold border-b border-white/20 pb-0.5 outline-none cursor-pointer text-white"
+                          className="bg-neutral-900 sm:bg-transparent font-semibold border border-white/15 sm:border-0 sm:border-b sm:border-white/20 px-2 sm:px-0 py-1 sm:py-0 rounded sm:rounded-none outline-none cursor-pointer text-white"
                         >
                           <option value="default" className="bg-neutral-900">Featured Atelier</option>
                           <option value="price-asc" className="bg-neutral-900">Price: Low to High</option>
