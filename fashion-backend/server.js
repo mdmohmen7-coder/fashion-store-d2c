@@ -10,7 +10,7 @@ const PORT = process.env.PORT || 5000;
 app.use(cors());
 app.use(express.json());
 
-// Aiven MySQL Database Connection Pool (Supports DATABASE_URL or individual keys)
+// Aiven MySQL Database Connection Pool (Støtter DATABASE_URL eller separate variabler)
 const poolConfig = process.env.DATABASE_URL
   ? {
       uri: process.env.DATABASE_URL,
@@ -33,7 +33,7 @@ const poolConfig = process.env.DATABASE_URL
 
 const pool = mysql.createPool(poolConfig);
 
-/// Health check / DB Test Route with deep error inspector
+// Testrute for databasetilkobling
 app.get('/api/db-test', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT 1 + 1 AS solution');
@@ -49,16 +49,17 @@ app.get('/api/db-test', async (req, res) => {
   }
 });
 
-// Database auto-initialize route
+// Databaseinitialisering (oppretter tabeller dersom de ikke eksisterer)
 app.get('/api/init-db', async (req, res) => {
   try {
-    // 1. Ensure Products Table
+    // 1. Tabell for produkter
     await pool.query(`
       CREATE TABLE IF NOT EXISTS products (
         id INT AUTO_INCREMENT PRIMARY KEY,
         title VARCHAR(255) NOT NULL,
         slug VARCHAR(255) NOT NULL UNIQUE,
         price DECIMAL(10, 2) NOT NULL,
+        stock INT DEFAULT 10,
         category VARCHAR(100) DEFAULT 'men',
         description TEXT,
         image_url VARCHAR(500),
@@ -66,7 +67,7 @@ app.get('/api/init-db', async (req, res) => {
       )
     `);
 
-    // 2. Ensure Orders Table
+    // 2. Tabell for ordrer
     await pool.query(`
       CREATE TABLE IF NOT EXISTS orders (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -84,7 +85,7 @@ app.get('/api/init-db', async (req, res) => {
       )
     `);
 
-    // 3. Ensure Reviews Table
+    // 3. Tabell for anmeldelser
     await pool.query(`
       CREATE TABLE IF NOT EXISTS reviews (
         id INT AUTO_INCREMENT PRIMARY KEY,
@@ -109,23 +110,36 @@ app.get('/api/init-db', async (req, res) => {
   }
 });
 
+// ==================== PRODUKT-API ==================== //
 
-// 2. Create a new product (POST /api/products)
+// 1. Hent alle produkter (GET /api/products)
+app.get('/api/products', async (req, res) => {
+  try {
+    const [rows] = await pool.query('SELECT * FROM products ORDER BY id DESC');
+    res.json({ success: true, data: rows });
+  } catch (error) {
+    console.error('Fetch products error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 2. Opprett et nytt produkt (POST /api/products)
 app.post('/api/products', async (req, res) => {
   try {
-    const { title, slug, price, category, description, image_url } = req.body;
+    const { title, slug, price, stock, category, description, image_url } = req.body;
 
     if (!title || !slug || !price) {
       return res.status(400).json({ success: false, message: 'Title, slug, and price are required' });
     }
 
     const [result] = await pool.query(
-      `INSERT INTO products (title, slug, price, category, description, image_url)
-       VALUES (?, ?, ?, ?, ?, ?)`,
+      `INSERT INTO products (title, slug, price, stock, category, description, image_url)
+       VALUES (?, ?, ?, ?, ?, ?, ?)`,
       [
         title,
         slug,
         Number(price),
+        stock !== undefined ? Number(stock) : 10,
         (category || 'men').toLowerCase(),
         description || '',
         image_url || 'https://images.unsplash.com/photo-1521572267360-ee0c2909d518?w=800'
@@ -143,9 +157,48 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// ==================== ORDERS API ==================== //
+// 3. Oppdater pris og lager for et produkt (PUT /api/products/:id)
+app.put('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const { price, stock } = req.body;
 
-// 1. Create a New Order (POST /api/orders)
+    const [result] = await pool.query(
+      'UPDATE products SET price = COALESCE(?, price), stock = COALESCE(?, stock) WHERE id = ?',
+      [price !== undefined ? Number(price) : null, stock !== undefined ? Number(stock) : null, id]
+    );
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found.' });
+    }
+
+    res.json({ success: true, message: `Product #${id} updated successfully!` });
+  } catch (error) {
+    console.error('Update product error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// 4. Slett et produkt permanent (DELETE /api/products/:id)
+app.delete('/api/products/:id', async (req, res) => {
+  try {
+    const { id } = req.params;
+    const [result] = await pool.query('DELETE FROM products WHERE id = ?', [id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Product not found' });
+    }
+
+    res.json({ success: true, message: 'Product deleted from database successfully!' });
+  } catch (error) {
+    console.error('Delete product error:', error.message);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ==================== ORDRE-API ==================== //
+
+// 1. Opprett en ny ordre (POST /api/orders)
 app.post('/api/orders', async (req, res) => {
   try {
     const {
@@ -194,7 +247,7 @@ app.post('/api/orders', async (req, res) => {
   }
 });
 
-// 2. Track an Order by ID (GET /api/orders/:id)
+// 2. Spor en ordre via ID (GET /api/orders/:id)
 app.get('/api/orders/:id', async (req, res) => {
   try {
     const { id } = req.params;
@@ -233,7 +286,7 @@ app.get('/api/orders/:id', async (req, res) => {
   }
 });
 
-// 3. Get All Orders for Admin (GET /api/orders)
+// 3. Hent alle ordrer til administrasjonspanelet (GET /api/orders)
 app.get('/api/orders', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM orders ORDER BY id DESC LIMIT 50');
@@ -244,7 +297,7 @@ app.get('/api/orders', async (req, res) => {
   }
 });
 
-// 4. Update Order Status from Admin (PUT /api/orders/:id/status)
+// 4. Oppdater ordrestatus fra administrasjonspanelet (PUT /api/orders/:id/status)
 app.put('/api/orders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
@@ -272,9 +325,9 @@ app.put('/api/orders/:id/status', async (req, res) => {
   }
 });
 
-// ==================== REVIEWS API ==================== //
+// ==================== ANMELDELSER-API ==================== //
 
-// 1. Get All Reviews (GET /api/reviews)
+// 1. Hent alle anmeldelser (GET /api/reviews)
 app.get('/api/reviews', async (req, res) => {
   try {
     const [rows] = await pool.query('SELECT * FROM reviews ORDER BY id DESC');
@@ -285,7 +338,7 @@ app.get('/api/reviews', async (req, res) => {
   }
 });
 
-// 2. Submit a New Review (POST /api/reviews)
+// 2. Publiser en ny anmeldelse (POST /api/reviews)
 app.post('/api/reviews', async (req, res) => {
   try {
     const { reviewer_name, rating, fit_feedback, review_text } = req.body;
@@ -309,7 +362,7 @@ app.post('/api/reviews', async (req, res) => {
   }
 });
 
-// Start Express Server
+// Start Express-server
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
