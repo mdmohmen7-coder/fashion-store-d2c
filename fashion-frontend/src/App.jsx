@@ -567,6 +567,46 @@ const handleTrackOrder = async (e) => {
     }
   };
 
+  const handleDeleteProduct = async (productId) => {
+    if (!window.confirm('Are you sure you want to permanently delete this product?')) return;
+
+    try {
+      const res = await axios.delete(`https://fashion-backend-api-s5sg.onrender.com/api/products/${productId}`);
+      if (res.data.success) {
+        setProductsList(prev => prev.filter(item => item.id !== productId));
+        alert('Product deleted successfully from Database!');
+      }
+    } catch (err) {
+      console.error('Delete error:', err);
+      alert('Failed to delete product from database.');
+    }
+  };
+
+  const handleUpdateProduct = async (productId, currentPrice, currentStock) => {
+    const newPrice = prompt('Enter new price ($):', currentPrice);
+    if (newPrice === null) return;
+
+    const newStock = prompt('Enter updated stock quantity (pcs):', currentStock || 10);
+    if (newStock === null) return;
+
+    try {
+      const res = await axios.put(`https://fashion-backend-api-s5sg.onrender.com/api/products/${productId}`, {
+        price: Number(newPrice),
+        stock: Number(newStock)
+      });
+
+      if (res.data.success) {
+        setProductsList(prev => prev.map(p => 
+          p.id === productId ? { ...p, price: Number(newPrice), stock: Number(newStock) } : p
+        ));
+        alert('Product details updated successfully in Database!');
+      }
+    } catch (err) {
+      console.error('Update product error:', err);
+      alert('Failed to update product details');
+    }
+  };
+
   const handleSubmitReview = async (e) => {
     e.preventDefault();
     if (!newReview.reviewer_name || !newReview.review_text) return;
@@ -1332,43 +1372,105 @@ const handleTrackOrder = async (e) => {
               </div>
             )}
 
-            {adminTab === 'inventory' && product && (
-              <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
-                <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
-                  <h2 className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider flex items-center gap-2 text-white">
-                    <Layers className="w-4 h-4 text-amber-400" /> Real-Time Atelier SKU Stock
-                  </h2>
-                  <select
-                    value={selectedSlug}
-                    onChange={(e) => handleSelectProduct(e.target.value)}
-                    className="p-2 border border-white/20 rounded bg-neutral-900 text-white text-xs font-semibold w-full sm:max-w-xs"
-                  >
-                    {productsList.slice(0, 50).map(p => (
-                      <option key={p.id} value={p.slug}>{p.title}</option>
-                    ))}
-                  </select>
+           {adminTab === 'inventory' && (
+              <div className="space-y-6">
+                {/* 1. Global Products Catalog (Edit & Delete Table) */}
+                <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md">
+                  <div className="p-4 border-b border-white/10 flex justify-between items-center">
+                    <h2 className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider flex items-center gap-2 text-white">
+                      <Layers className="w-4 h-4 text-amber-400" /> Database Product Catalog
+                    </h2>
+                    <span className="text-xs font-mono text-slate-400">Total: {productsList.length} items</span>
+                  </div>
+                  <div className="overflow-x-auto">
+                    <table className="w-full text-left text-xs">
+                      <thead className="bg-white/5 border-b border-white/10 text-slate-400 font-mono uppercase">
+                        <tr>
+                          <th className="p-4">Item</th>
+                          <th className="p-4">Category</th>
+                          <th className="p-4">Price</th>
+                          <th className="p-4 text-right">Actions</th>
+                        </tr>
+                      </thead>
+                      <tbody className="divide-y divide-white/5">
+                        {productsList.map(item => (
+                          <tr key={item.id} className="hover:bg-white/5">
+                            <td className="p-4 flex items-center gap-3">
+                              {item.image_url && (
+                                <img src={item.image_url} alt={item.title} className="w-9 h-12 object-cover rounded bg-neutral-900 border border-white/10" />
+                              )}
+                              <div>
+                                <p className="font-semibold text-white">{item.title}</p>
+                                <p className="text-slate-500 font-mono text-[10px]">#{item.id} • {item.slug}</p>
+                              </div>
+                            </td>
+                            <td className="p-4 font-mono text-slate-300 capitalize">{item.category || 'Men'}</td>
+                            <td className="p-4 font-bold text-amber-400 font-mono">${item.price}</td>
+                            <td className="p-4 text-right">
+                              <div className="flex justify-end gap-2">
+                                <button
+                                  type="button"
+                                  onClick={() => handleUpdateProduct(item.id, item.price, item.stock || 10)}
+                                  className="text-xs bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-black px-2.5 py-1 rounded transition border border-amber-500/30 font-medium font-mono"
+                                >
+                                  Edit
+                                </button>
+                                <button
+                                  type="button"
+                                  onClick={() => handleDeleteProduct(item.id)}
+                                  className="text-xs bg-red-500/10 hover:bg-red-500 text-red-500 hover:text-white px-2.5 py-1 rounded transition border border-red-500/30 font-medium font-mono"
+                                >
+                                  Delete
+                                </button>
+                              </div>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
+                  </div>
                 </div>
 
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-                  {(product.variants || []).map(variant => (
-                    <div key={variant.id} className="border border-white/10 bg-black/40 p-4 rounded-xl flex justify-between items-center">
-                      <div>
-                        <p className="font-bold text-sm text-white">{variant.color_name} / Size {variant.size_name}</p>
-                        <p className="text-xs text-slate-500 font-mono">SKU: {variant.sku}</p>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        <input
-                          type="number"
-                          min="0"
-                          defaultValue={variant.stock_quantity}
-                          onBlur={(e) => handleUpdateStock(variant.id, e.target.value)}
-                          className="w-16 p-2 bg-neutral-900 border border-white/20 rounded font-bold text-center text-sm text-white focus:border-white outline-none"
-                        />
-                        <span className="text-xs text-slate-500 font-mono">pcs</span>
-                      </div>
+                {/* 2. Real-Time Atelier SKU Stock Details */}
+                {product && (
+                  <div className="bg-white/5 border border-white/10 rounded-2xl p-6 backdrop-blur-md">
+                    <div className="flex flex-col sm:flex-row justify-between items-center gap-3 mb-6">
+                      <h2 className="text-xs sm:text-sm font-mono font-bold uppercase tracking-wider flex items-center gap-2 text-white">
+                        <Layers className="w-4 h-4 text-amber-400" /> Real-Time Atelier SKU Stock
+                      </h2>
+                      <select
+                        value={selectedSlug}
+                        onChange={(e) => handleSelectProduct(e.target.value)}
+                        className="p-2 border border-white/20 rounded bg-neutral-900 text-white text-xs font-semibold w-full sm:max-w-xs"
+                      >
+                        {productsList.slice(0, 50).map(p => (
+                          <option key={p.id} value={p.slug}>{p.title}</option>
+                        ))}
+                      </select>
                     </div>
-                  ))}
-                </div>
+
+                    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                      {(product.variants || []).map(variant => (
+                        <div key={variant.id} className="border border-white/10 bg-black/40 p-4 rounded-xl flex justify-between items-center">
+                          <div>
+                            <p className="font-bold text-sm text-white">{variant.color_name} / Size {variant.size_name}</p>
+                            <p className="text-xs text-slate-500 font-mono">SKU: {variant.sku}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <input
+                              type="number"
+                              min="0"
+                              defaultValue={variant.stock_quantity}
+                              onBlur={(e) => handleUpdateStock(variant.id, e.target.value)}
+                              className="w-16 p-2 bg-neutral-900 border border-white/20 rounded font-bold text-center text-sm text-white focus:border-white outline-none"
+                            />
+                            <span className="text-xs text-slate-500 font-mono">pcs</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
               </div>
             )}
 
