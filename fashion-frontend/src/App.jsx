@@ -397,7 +397,7 @@ export default function App() {
     }
   };
 
-const handlePlaceOrder = async (e) => {
+  const handlePlaceOrder = async (e) => {
     e.preventDefault();
     setOrderSubmitting(true);
 
@@ -449,7 +449,7 @@ const handlePlaceOrder = async (e) => {
     }
   };
 
-const handleTrackOrder = async (e) => {
+  const handleTrackOrder = async (e) => {
     e.preventDefault();
     if (!trackOrderId.trim()) return;
     setTrackingLoading(true);
@@ -473,7 +473,7 @@ const handleTrackOrder = async (e) => {
     }
   };
 
- const handleUpdateOrderStatus = async (orderId, newStatus) => {
+  const handleUpdateOrderStatus = async (orderId, newStatus) => {
     // 1. UI-te shathe shathe status change kora
     setOrders(prev => prev.map(o => o.id === orderId ? { ...o, order_status: newStatus } : o));
 
@@ -494,7 +494,7 @@ const handleTrackOrder = async (e) => {
     }));
   };
 
- const handleCreateProduct = async (e) => {
+  const handleCreateProduct = async (e) => {
     e.preventDefault();
     setIsAddingProduct(true);
 
@@ -582,27 +582,23 @@ const handleTrackOrder = async (e) => {
     }
   };
 
-  const handleUpdateProduct = async (productId, currentPrice, currentStock) => {
+  const handleUpdateProduct = async (productId, currentPrice) => {
     const newPrice = prompt('Enter new price ($):', currentPrice);
-    if (newPrice === null) return;
-
-    const newStock = prompt('Enter updated stock quantity (pcs):', currentStock || 10);
-    if (newStock === null) return;
+    if (!newPrice || isNaN(Number(newPrice))) return;
 
     try {
       const res = await axios.put(`https://fashion-backend-api-s5sg.onrender.com/api/products/${productId}`, {
-        price: Number(newPrice),
-        stock: Number(newStock)
+        price: Number(newPrice)
       });
 
       if (res.data.success) {
-        setProductsList(prev => prev.map(p => 
-          p.id === productId ? { ...p, price: Number(newPrice), stock: Number(newStock) } : p
+        setProductsList(prev => prev.map(p =>
+          p.id === productId ? { ...p, price: Number(newPrice) } : p
         ));
-        alert('Product details updated successfully in Database!');
+        alert('Product price updated successfully in Database!');
       }
     } catch (err) {
-      console.error('Update product error:', err);
+      console.error('Update error:', err);
       alert('Failed to update product details');
     }
   };
@@ -674,8 +670,8 @@ const handleTrackOrder = async (e) => {
               <button
                 onClick={() => { setView('store'); setStoreMode('catalog'); setSelectedCategory('Featured'); }}
                 className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Featured' && view === 'store'
-                    ? 'text-amber-300 bg-white/10'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  ? 'text-amber-300 bg-white/10'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
               >
                 Atelier Home
@@ -683,8 +679,8 @@ const handleTrackOrder = async (e) => {
               <button
                 onClick={() => handleNavCategory('Women')}
                 className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Women' && view === 'store'
-                    ? 'text-amber-300 bg-white/10'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  ? 'text-amber-300 bg-white/10'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
               >
                 Women
@@ -692,8 +688,8 @@ const handleTrackOrder = async (e) => {
               <button
                 onClick={() => handleNavCategory('Men')}
                 className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Men' && view === 'store'
-                    ? 'text-amber-300 bg-white/10'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  ? 'text-amber-300 bg-white/10'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
               >
                 Men
@@ -701,8 +697,8 @@ const handleTrackOrder = async (e) => {
               <button
                 onClick={() => handleNavCategory('Kids')}
                 className={`px-3 py-1.5 text-xs font-bold uppercase tracking-widest transition-all rounded-lg ${selectedCategory === 'Kids' && view === 'store'
-                    ? 'text-amber-300 bg-white/10'
-                    : 'text-slate-300 hover:text-white hover:bg-white/5'
+                  ? 'text-amber-300 bg-white/10'
+                  : 'text-slate-300 hover:text-white hover:bg-white/5'
                   }`}
               >
                 Kids
@@ -835,7 +831,7 @@ const handleTrackOrder = async (e) => {
                     <h1 className="text-4xl sm:text-6xl md:text-7xl lg:text-8xl font-black tracking-tight text-white leading-[1.08] mb-6">
                       Portfolio Website. <br />
                       <span className="font-serif italic font-light text-transparent bg-clip-text bg-gradient-to-r from-amber-200 via-white to-slate-300">
-                       MD Mohmen
+                        MD Mohmen
                       </span>
                     </h1>
 
@@ -987,8 +983,8 @@ const handleTrackOrder = async (e) => {
                         <button
                           onClick={() => setSelectedCategory('Featured')}
                           className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${selectedCategory === 'Featured'
-                              ? 'bg-white text-black shadow-lg shadow-white/15'
-                              : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
+                            ? 'bg-white text-black shadow-lg shadow-white/15'
+                            : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
                             }`}
                         >
                           Curated Drops
@@ -998,8 +994,8 @@ const handleTrackOrder = async (e) => {
                             key={cat}
                             onClick={() => setSelectedCategory(cat)}
                             className={`px-3.5 sm:px-5 py-2 text-[11px] sm:text-xs font-bold uppercase tracking-widest rounded-full whitespace-nowrap shrink-0 transition-all ${selectedCategory === cat
-                                ? 'bg-white text-black shadow-lg shadow-white/15'
-                                : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
+                              ? 'bg-white text-black shadow-lg shadow-white/15'
+                              : 'bg-white/5 text-slate-400 hover:text-white hover:bg-white/10 border border-white/10'
                               }`}
                           >
                             {cat}
@@ -1346,8 +1342,8 @@ const handleTrackOrder = async (e) => {
                         <td className="p-4 font-bold text-white font-mono">${order.total_amount}</td>
                         <td className="p-4">
                           <span className={`px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider font-mono ${order.order_status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                              order.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                                'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                            order.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                              'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                             }`}>
                             {order.order_status}
                           </span>
@@ -1372,7 +1368,7 @@ const handleTrackOrder = async (e) => {
               </div>
             )}
 
-           {adminTab === 'inventory' && (
+            {adminTab === 'inventory' && (
               <div className="space-y-6">
                 {/* 1. Global Products Catalog (Edit & Delete Table) */}
                 <div className="bg-white/5 border border-white/10 rounded-2xl overflow-hidden shadow-2xl backdrop-blur-md">
@@ -1410,7 +1406,7 @@ const handleTrackOrder = async (e) => {
                               <div className="flex justify-end gap-2">
                                 <button
                                   type="button"
-                                  onClick={() => handleUpdateProduct(item.id, item.price, item.stock || 10)}
+                                  onClick={() => handleUpdateProduct(item.id, item.price)}
                                   className="text-xs bg-amber-500/10 hover:bg-amber-500 text-amber-500 hover:text-black px-2.5 py-1 rounded transition border border-amber-500/30 font-medium font-mono"
                                 >
                                   Edit
@@ -1714,8 +1710,8 @@ const handleTrackOrder = async (e) => {
                     <p className="font-extrabold text-base text-amber-300">#{trackingResult.id}</p>
                   </div>
                   <span className={`px-3 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider ${trackingResult.order_status === 'delivered' ? 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/30' :
-                      trackingResult.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
-                        'bg-amber-500/20 text-amber-400 border border-amber-500/30'
+                    trackingResult.order_status === 'shipped' ? 'bg-blue-500/20 text-blue-400 border border-blue-500/30' :
+                      'bg-amber-500/20 text-amber-400 border border-amber-500/30'
                     }`}>
                     {trackingResult.order_status}
                   </span>

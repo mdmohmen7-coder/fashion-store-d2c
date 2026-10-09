@@ -157,19 +157,24 @@ app.post('/api/products', async (req, res) => {
   }
 });
 
-// 3. Oppdater pris og lager for et produkt (PUT /api/products/:id)
+
+// Update Product Price (PUT /api/products/:id)
 app.put('/api/products/:id', async (req, res) => {
   try {
     const { id } = req.params;
-    const { price, stock } = req.body;
+    const { price } = req.body;
+
+    if (price === undefined || isNaN(Number(price))) {
+      return res.status(400).json({ success: false, message: 'Valid price is required' });
+    }
 
     const [result] = await pool.query(
-      'UPDATE products SET price = COALESCE(?, price), stock = COALESCE(?, stock) WHERE id = ?',
-      [price !== undefined ? Number(price) : null, stock !== undefined ? Number(stock) : null, id]
+      'UPDATE products SET price = ? WHERE id = ?',
+      [Number(price), id]
     );
 
     if (result.affectedRows === 0) {
-      return res.status(404).json({ success: false, message: 'Product not found.' });
+      return res.status(404).json({ success: false, message: 'Product not found' });
     }
 
     res.json({ success: true, message: `Product #${id} updated successfully!` });
@@ -178,7 +183,6 @@ app.put('/api/products/:id', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
-
 // 4. Slett et produkt permanent (DELETE /api/products/:id)
 app.delete('/api/products/:id', async (req, res) => {
   try {
