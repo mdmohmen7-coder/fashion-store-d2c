@@ -1145,6 +1145,31 @@ export default function App() {
                       </div>
                     </div>
 
+                    {/* ALL ATELIER SIZES SELECTION */}
+                    <div className="mb-6">
+                      <div className="flex justify-between items-center mb-2.5">
+                        <span className="text-xs font-mono uppercase tracking-wider text-slate-400">Select Atelier Size</span>
+                        <span className="text-xs text-slate-400 hover:text-white cursor-pointer font-mono underline underline-offset-4">Atelier Measurements</span>
+                      </div>
+                      <div className="flex flex-wrap gap-2.5">
+                        {['S', 'M', 'L', 'XL', 'XXL'].map((sz) => (
+                          <button
+                            key={sz}
+                            type="button"
+                            onClick={() => setSelectedSize(sz)}
+                            className={`px-4 py-2 rounded-lg font-mono text-xs font-bold transition border ${
+                              selectedSize === sz
+                                ? 'bg-amber-400 text-black border-amber-400 shadow-md shadow-amber-400/20'
+                                : 'bg-white/5 border-white/20 text-white hover:border-white/50 hover:bg-white/10'
+                            }`}
+                          >
+                            {sz}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+
+                    {/* ADD TO BAG BUTTON */}
                     <button
                       onClick={() => handleAddToCart(product, selectedSize, selectedColor)}
                       disabled={!selectedSize || (currentVariant && currentVariant.stock_quantity === 0)}
@@ -1153,12 +1178,46 @@ export default function App() {
                       {!selectedSize ? 'Select An Atelier Size' : currentVariant?.stock_quantity === 0 ? 'Out of Stock' : 'Add to Wardrobe Bag'}
                     </button>
 
+                    {/* BADGES */}
                     <div className="mt-8 border-t border-white/10 pt-6 grid grid-cols-2 gap-4 text-xs text-slate-400 font-mono">
                       <div className="flex items-center gap-2">
                         <ShieldCheck className="w-4 h-4 text-amber-400" /> 100% Organic Materials
                       </div>
                       <div className="flex items-center gap-2">
                         <RefreshCw className="w-4 h-4 text-amber-400" /> Complimentary 30-Day Returns
+                      </div>
+                    </div>
+
+                    {/* DETAILED PRODUCT DESCRIPTION SECTION */}
+                    <div className="mt-8 border-t border-white/10 pt-6 space-y-4">
+                      <div className="flex items-center gap-2">
+                        <span className="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+                        <h3 className="text-xs sm:text-sm font-mono uppercase tracking-widest font-bold text-white">
+                          Product Description & Atelier Notes
+                        </h3>
+                      </div>
+
+                      <p className="text-xs sm:text-sm text-slate-300 leading-relaxed font-sans">
+                        {product?.description || "Crafted with precision from 100% certified organic loopback cotton fleece. Engineered for exceptional warmth, natural breathable comfort, and a structured luxury silhouette designed for contemporary everyday wear."}
+                      </p>
+
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 pt-3 text-xs font-mono">
+                        <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                          <span className="block text-slate-500 uppercase text-[10px] tracking-wider">Fabric Composition</span>
+                          <span className="text-slate-200 font-medium">100% Organic Loopback Fleece</span>
+                        </div>
+                        <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                          <span className="block text-slate-500 uppercase text-[10px] tracking-wider">Silhouette & Fit</span>
+                          <span className="text-slate-200 font-medium">Tailored Luxury Relaxed Fit</span>
+                        </div>
+                        <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                          <span className="block text-slate-500 uppercase text-[10px] tracking-wider">Atelier Construction</span>
+                          <span className="text-slate-200 font-medium">Reinforced Seams & Ribbed Trims</span>
+                        </div>
+                        <div className="bg-white/5 p-3 rounded-xl border border-white/10">
+                          <span className="block text-slate-500 uppercase text-[10px] tracking-wider">Garment Care</span>
+                          <span className="text-slate-200 font-medium">Gentle Cold Wash • Dry Flat</span>
+                        </div>
                       </div>
                     </div>
                   </div>
