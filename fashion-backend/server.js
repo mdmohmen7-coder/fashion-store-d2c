@@ -248,9 +248,24 @@ app.get('/api/orders', async (req, res) => {
 app.put('/api/orders/:id/status', async (req, res) => {
   try {
     const { id } = req.params;
-    const { status } = req.body;
-    await pool.query('UPDATE orders SET order_status = ? WHERE id = ?', [status, id]);
-    res.json({ success: true, message: 'Order status updated successfully' });
+    const { order_status, status } = req.body;
+    const updatedStatus = order_status || status;
+
+    const validStatuses = ['processing', 'shipped', 'delivered', 'cancelled'];
+    if (!validStatuses.includes(updatedStatus)) {
+      return res.status(400).json({ 
+        success: false, 
+        message: 'Invalid status. Allowed: processing, shipped, delivered, cancelled' 
+      });
+    }
+
+    const [result] = await pool.query('UPDATE orders SET order_status = ? WHERE id = ?', [updatedStatus, id]);
+
+    if (result.affectedRows === 0) {
+      return res.status(404).json({ success: false, message: 'Order not found' });
+    }
+
+    res.json({ success: true, message: `Order #${id} status updated to ${updatedStatus} successfully!` });
   } catch (error) {
     console.error('Update status error:', error.message);
     res.status(500).json({ success: false, error: error.message });
